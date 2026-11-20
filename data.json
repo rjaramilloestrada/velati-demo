@@ -37,47 +37,409 @@
     "pedido_titulo": "Hola Velati 💗 Quiero hacer un pedido:",
     "pie": "Hola Velati 💗 Vi su página y quiero hacer una consulta."
   },
-  "precios_etiqueta": "Precios referenciales, Navidad 2025",
+  "precios_etiqueta": "Precios referenciales de Navidad 2025, por actualizar a 2026",
   "categorias": [
-    { "id": "todos", "nombre": "Todo" },
-    { "id": "vela", "nombre": "Velas" },
-    { "id": "combo", "nombre": "Combos" },
-    { "id": "mini", "nombre": "Mini" },
-    { "id": "caja", "nombre": "Cajas" },
-    { "id": "vaso", "nombre": "Vasos" },
-    { "id": "bouquet", "nombre": "Bouquets" },
-    { "id": "taza", "nombre": "Tazas" }
+    {
+      "id": "todos",
+      "nombre": "Todo"
+    },
+    {
+      "id": "vela",
+      "nombre": "Velas"
+    },
+    {
+      "id": "combo",
+      "nombre": "Combos"
+    },
+    {
+      "id": "mini",
+      "nombre": "Mini"
+    },
+    {
+      "id": "caja",
+      "nombre": "Cajas"
+    },
+    {
+      "id": "vaso",
+      "nombre": "Vasos"
+    },
+    {
+      "id": "bouquet",
+      "nombre": "Bouquets"
+    },
+    {
+      "id": "taza",
+      "nombre": "Tazas"
+    }
   ],
   "productos": [
-    { "id": "copo-nieve", "nombre": "Copo de nieve", "descripcion": "Copo de nieve grande", "coleccion": "navidad", "categoria": "vela", "precio": 5, "oferta": null, "ilustracion": "copo", "estado": "referencial_2025" },
-    { "id": "arbol-reno", "nombre": "Árbol + Reno", "descripcion": "Combo arbolito tornado + reno pequeño", "coleccion": "navidad", "categoria": "combo", "precio": 8, "oferta": null, "ilustracion": "arbol", "estado": "referencial_2025" },
-    { "id": "arbolito-tornado", "nombre": "Arbolito tornado", "descripcion": "Arbolito pequeño tornado", "coleccion": "navidad", "categoria": "vela", "precio": 5, "oferta": null, "ilustracion": "tornado", "estado": "referencial_2025" },
-    { "id": "pina", "nombre": "Piña navideña", "descripcion": "Piña navideña", "coleccion": "navidad", "categoria": "vela", "precio": 5, "oferta": null, "ilustracion": "pina", "estado": "referencial_2025" },
-    { "id": "arbol-grande", "nombre": "Árbol grande", "descripcion": "Árbol grande", "coleccion": "navidad", "categoria": "vela", "precio": 6, "oferta": null, "ilustracion": "arbol", "estado": "referencial_2025" },
-    { "id": "reno", "nombre": "Reno", "descripcion": "Reno navideño, 2 x 8", "coleccion": "navidad", "categoria": "vela", "precio": 4, "oferta": { "cantidad": 2, "precio": 8 }, "ilustracion": "reno", "estado": "referencial_2025" },
-    { "id": "papa-noel", "nombre": "Papá Noel", "descripcion": "Papá Noel con regalito en las manos", "coleccion": "navidad", "categoria": "vela", "precio": 5, "oferta": null, "ilustracion": "noel", "estado": "referencial_2025" },
-    { "id": "nomos", "nombre": "Nomos", "descripcion": "Kit 2 nomos con arbolitos", "coleccion": "navidad", "categoria": "combo", "precio": 10, "oferta": null, "ilustracion": "nomo", "estado": "referencial_2025" },
-    { "id": "nomos-papa-noel", "nombre": "Nomos + Papá Noel", "descripcion": "Papá Noel + nomos, kit 3", "coleccion": "navidad", "categoria": "combo", "precio": 15, "oferta": null, "ilustracion": "noel", "estado": "referencial_2025" },
-    { "id": "nomo", "nombre": "Nomo", "descripcion": "Nomo con arbolito", "coleccion": "navidad", "categoria": "vela", "precio": 5, "oferta": null, "ilustracion": "nomo", "estado": "referencial_2025" },
-    { "id": "regalito", "nombre": "Regalito", "descripcion": "Regalito de Navidad", "coleccion": "navidad", "categoria": "mini", "precio": 3, "oferta": null, "ilustracion": "regalo", "estado": "referencial_2025" },
-    { "id": "caja-x4", "nombre": "Caja navideña x4", "descripcion": "3 velas grandes + 1 pequeña", "coleccion": "navidad", "categoria": "caja", "precio": 20, "oferta": null, "ilustracion": "caja", "estado": "referencial_2025" },
-    { "id": "copos-pequenos", "nombre": "Copos pequeños", "descripcion": "Copos de nieve, 4 cada uno, 3 x 10", "coleccion": "navidad", "categoria": "mini", "precio": 4, "oferta": { "cantidad": 3, "precio": 10 }, "ilustracion": "copo", "estado": "referencial_2025" },
-    { "id": "munequito", "nombre": "Muñequito", "descripcion": "Muñequito de jengibre", "coleccion": "navidad", "categoria": "mini", "precio": 4, "oferta": null, "ilustracion": "jengibre", "estado": "referencial_2025" },
-    { "id": "arbolito", "nombre": "Arbolito", "descripcion": "Arbolito navideño", "coleccion": "navidad", "categoria": "mini", "precio": 4, "oferta": null, "ilustracion": "arbol", "estado": "referencial_2025" },
-    { "id": "caja-x5", "nombre": "Caja navideña x5", "descripcion": "Paquete de productos de belleza para baño", "coleccion": "navidad", "categoria": "caja", "precio": 20, "oferta": null, "ilustracion": "caja", "estado": "referencial_2025" },
-    { "id": "kit-3", "nombre": "Kit 3", "descripcion": "Muñeco de jengibre, hoja y nuez", "coleccion": "navidad", "categoria": "combo", "precio": 12, "oferta": null, "ilustracion": "jengibre", "estado": "referencial_2025" },
-    { "id": "vaso-x3", "nombre": "Vaso navideño x3", "descripcion": "Vasos de bambú personalizados", "coleccion": "navidad", "categoria": "vaso", "precio": 30, "oferta": null, "ilustracion": "vaso", "estado": "referencial_2025" },
-    { "id": "vaso", "nombre": "Vaso navideño", "descripcion": "Vaso de bambú personalizado", "coleccion": "navidad", "categoria": "vaso", "precio": 10, "oferta": null, "ilustracion": "vaso", "estado": "referencial_2025" },
-    { "id": "tazas", "nombre": "Tazas navideñas", "descripcion": "Taza 12, taza 15, taza 20", "coleccion": "navidad", "categoria": "taza", "precio": null, "precio_texto": "$12 a $20", "oferta": null, "ilustracion": "taza", "estado": "proximamente" },
-    { "id": "bouquet-verde", "nombre": "Bouquet verde", "descripcion": "Bouquets by Velati", "coleccion": "navidad", "categoria": "bouquet", "precio": 25, "oferta": null, "ilustracion": "bouquet", "tono": "#8fa086", "estado": "referencial_2025" },
-    { "id": "bouquet-rosa", "nombre": "Bouquet rosa", "descripcion": "Bouquets by Velati", "coleccion": "navidad", "categoria": "bouquet", "precio": 25, "oferta": null, "ilustracion": "bouquet", "tono": "#e4a5ae", "estado": "referencial_2025" },
-    { "id": "bouquet-lila", "nombre": "Bouquet lila", "descripcion": "Bouquets by Velati", "coleccion": "navidad", "categoria": "bouquet", "precio": 30, "oferta": null, "ilustracion": "bouquet", "tono": "#b7a3c8", "estado": "referencial_2025" },
-    { "id": "bouquet-cafe", "nombre": "Bouquet café", "descripcion": "Bouquets by Velati", "coleccion": "navidad", "categoria": "bouquet", "precio": 30, "oferta": null, "ilustracion": "bouquet", "tono": "#a47b62", "estado": "referencial_2025" }
+    {
+      "id": "copo-nieve",
+      "nombre": "Copo de nieve",
+      "descripcion": "Copo de nieve grande",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 5,
+      "oferta": null,
+      "ilustracion": "copo",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "arbol-reno",
+      "nombre": "Árbol + Reno",
+      "descripcion": "Combo arbolito tornado + reno pequeño",
+      "coleccion": "navidad",
+      "categoria": "combo",
+      "precio": 8,
+      "oferta": null,
+      "ilustracion": "arbol",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "arbolito-tornado",
+      "nombre": "Arbolito tornado",
+      "descripcion": "Arbolito pequeño tornado",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 5,
+      "oferta": null,
+      "ilustracion": "tornado",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "pina",
+      "nombre": "Piña navideña",
+      "descripcion": "Piña navideña",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 5,
+      "oferta": null,
+      "ilustracion": "pina",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "arbol-grande",
+      "nombre": "Árbol grande",
+      "descripcion": "Árbol grande",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 6,
+      "oferta": null,
+      "ilustracion": "arbol",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "reno",
+      "nombre": "Reno",
+      "descripcion": "Reno navideño, 2 x 8",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 4,
+      "oferta": {
+        "cantidad": 2,
+        "precio": 8
+      },
+      "ilustracion": "reno",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "papa-noel",
+      "nombre": "Papá Noel",
+      "descripcion": "Papá Noel con regalito en las manos",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 5,
+      "oferta": null,
+      "ilustracion": "noel",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "nomos",
+      "nombre": "Nomos",
+      "descripcion": "Kit 2 nomos con arbolitos",
+      "coleccion": "navidad",
+      "categoria": "combo",
+      "precio": 10,
+      "oferta": null,
+      "ilustracion": "nomo",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "nomos-papa-noel",
+      "nombre": "Nomos + Papá Noel",
+      "descripcion": "Papá Noel + nomos, kit 3",
+      "coleccion": "navidad",
+      "categoria": "combo",
+      "precio": 15,
+      "oferta": null,
+      "ilustracion": "noel",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "nomo",
+      "nombre": "Nomo",
+      "descripcion": "Nomo con arbolito",
+      "coleccion": "navidad",
+      "categoria": "vela",
+      "precio": 5,
+      "oferta": null,
+      "ilustracion": "nomo",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "regalito",
+      "nombre": "Regalito",
+      "descripcion": "Regalito de Navidad",
+      "coleccion": "navidad",
+      "categoria": "mini",
+      "precio": 3,
+      "oferta": null,
+      "ilustracion": "regalo",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "caja-x4",
+      "nombre": "Caja navideña x4",
+      "descripcion": "3 velas grandes + 1 pequeña",
+      "coleccion": "navidad",
+      "categoria": "caja",
+      "precio": 20,
+      "oferta": null,
+      "ilustracion": "caja",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "copos-pequenos",
+      "nombre": "Copos pequeños",
+      "descripcion": "Copos de nieve, 4 cada uno, 3 x 10",
+      "coleccion": "navidad",
+      "categoria": "mini",
+      "precio": 4,
+      "oferta": {
+        "cantidad": 3,
+        "precio": 10
+      },
+      "ilustracion": "copo",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "munequito",
+      "nombre": "Muñequito",
+      "descripcion": "Muñequito de jengibre",
+      "coleccion": "navidad",
+      "categoria": "mini",
+      "precio": 4,
+      "oferta": null,
+      "ilustracion": "jengibre",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "arbolito",
+      "nombre": "Arbolito",
+      "descripcion": "Arbolito navideño",
+      "coleccion": "navidad",
+      "categoria": "mini",
+      "precio": 4,
+      "oferta": null,
+      "ilustracion": "arbol",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "caja-x5",
+      "nombre": "Caja navideña x5",
+      "descripcion": "Paquete de productos de belleza para baño",
+      "coleccion": "navidad",
+      "categoria": "caja",
+      "precio": 20,
+      "oferta": null,
+      "ilustracion": "caja",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "kit-3",
+      "nombre": "Kit 3",
+      "descripcion": "Muñeco de jengibre, hoja y nuez",
+      "coleccion": "navidad",
+      "categoria": "combo",
+      "precio": 12,
+      "oferta": null,
+      "ilustracion": "jengibre",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "vaso-x3",
+      "nombre": "Vaso navideño x3",
+      "descripcion": "Vasos de bambú personalizados",
+      "coleccion": "navidad",
+      "categoria": "vaso",
+      "precio": 30,
+      "oferta": null,
+      "ilustracion": "vaso",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "vaso",
+      "nombre": "Vaso navideño",
+      "descripcion": "Vaso de bambú personalizado",
+      "coleccion": "navidad",
+      "categoria": "vaso",
+      "precio": 10,
+      "oferta": null,
+      "ilustracion": "vaso",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "tazas",
+      "nombre": "Tazas navideñas",
+      "descripcion": "Taza 12, taza 15, taza 20",
+      "coleccion": "navidad",
+      "categoria": "taza",
+      "precio": null,
+      "precio_texto": "$12 a $20",
+      "oferta": null,
+      "ilustracion": "taza",
+      "estado": "proximamente",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "bouquet-verde",
+      "nombre": "Bouquet verde",
+      "descripcion": "Bouquets by Velati",
+      "coleccion": "navidad",
+      "categoria": "bouquet",
+      "precio": 25,
+      "oferta": null,
+      "ilustracion": "bouquet",
+      "tono": "#8fa086",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "bouquet-rosa",
+      "nombre": "Bouquet rosa",
+      "descripcion": "Bouquets by Velati",
+      "coleccion": "navidad",
+      "categoria": "bouquet",
+      "precio": 25,
+      "oferta": null,
+      "ilustracion": "bouquet",
+      "tono": "#e4a5ae",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "bouquet-lila",
+      "nombre": "Bouquet lila",
+      "descripcion": "Bouquets by Velati",
+      "coleccion": "navidad",
+      "categoria": "bouquet",
+      "precio": 30,
+      "oferta": null,
+      "ilustracion": "bouquet",
+      "tono": "#b7a3c8",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    },
+    {
+      "id": "bouquet-cafe",
+      "nombre": "Bouquet café",
+      "descripcion": "Bouquets by Velati",
+      "coleccion": "navidad",
+      "categoria": "bouquet",
+      "precio": 30,
+      "oferta": null,
+      "ilustracion": "bouquet",
+      "tono": "#a47b62",
+      "estado": "referencial_2025",
+      "fotos": [],
+      "sellos": [],
+      "variantes": null
+    }
   ],
   "presentaciones": [
-    { "id": "sin-caja", "nombre": "Sin caja", "descripcion": "Tus velas tal cual", "producto": null },
-    { "id": "caja-x4", "nombre": "Caja navideña x4", "descripcion": "3 velas grandes + 1 pequeña", "producto": "caja-x4" },
-    { "id": "caja-x5", "nombre": "Caja navideña x5", "descripcion": "Paquete de productos de belleza para baño", "producto": "caja-x5" }
+    {
+      "id": "sin-caja",
+      "nombre": "Sin caja",
+      "descripcion": "Tus velas tal cual",
+      "producto": null
+    },
+    {
+      "id": "caja-x4",
+      "nombre": "Caja navideña x4",
+      "descripcion": "3 velas grandes + 1 pequeña",
+      "producto": "caja-x4"
+    },
+    {
+      "id": "caja-x5",
+      "nombre": "Caja navideña x5",
+      "descripcion": "Paquete de productos de belleza para baño",
+      "producto": "caja-x5"
+    }
   ],
   "tarjeta": {
     "encabezado": "Enjoy the essence of Christmas",
@@ -89,13 +451,27 @@
       "nombre": "Taller de Velas, Edición 01: Moldes",
       "precio": 25,
       "incluye": "materiales",
-      "aprendes": ["Qué cera usar", "Temperaturas", "Técnica de velas de molde"],
+      "aprendes": [
+        "Qué cera usar",
+        "Temperaturas",
+        "Técnica de velas de molde"
+      ],
       "duracion": "3 a 3,5 horas aprox., según los flyers",
       "lugar": "CC Albán Borja",
       "cupos_texto": "Cupos limitados",
       "fechas": [
-        { "fecha": "2026-09-12", "hora_inicio": "09:30", "hora_fin": "12:30", "cupos": null },
-        { "fecha": "2026-10-24", "hora_inicio": "10:00", "hora_fin": "13:30", "cupos": null }
+        {
+          "fecha": "2026-09-12",
+          "hora_inicio": "09:30",
+          "hora_fin": "12:30",
+          "cupos": null
+        },
+        {
+          "fecha": "2026-10-24",
+          "hora_inicio": "10:00",
+          "hora_fin": "13:30",
+          "cupos": null
+        }
       ],
       "estado": "verificado"
     }
@@ -104,17 +480,47 @@
     "min": 6,
     "max": 8,
     "precio_persona": 25,
-    "dias": ["lun", "mar", "mie", "jue", "vie", "sab"],
+    "dias": [
+      "lun",
+      "mar",
+      "mie",
+      "jue",
+      "vie",
+      "sab"
+    ],
     "incluye": "materiales",
     "cupos_texto": "Cupos limitados",
-    "ocasiones": ["Cumpleaños", "Despedida", "Amigas", "Empresa"]
+    "ocasiones": [
+      "Cumpleaños",
+      "Despedida",
+      "Amigas",
+      "Empresa"
+    ]
   },
-  "corporativo": { "mostrar": false },
+  "corporativo": {
+    "mostrar": false
+  },
   "colecciones_anio": [
-    { "nombre": "Christmas Collection", "nota": "Navidad", "tono": "#9e2330" },
-    { "nombre": "Velatines", "nota": "Valentine's Collection", "tono": "#d77c8c" },
-    { "nombre": "Mother's Day Collection", "nota": "Día de la Madre", "tono": "#b7a3c8" },
-    { "nombre": "Iced Latte Collection", "nota": "Por temporada", "tono": "#a47b62" }
+    {
+      "nombre": "Christmas Collection",
+      "nota": "Navidad",
+      "tono": "#9e2330"
+    },
+    {
+      "nombre": "Velatines",
+      "nota": "Valentine's Collection",
+      "tono": "#d77c8c"
+    },
+    {
+      "nombre": "Mother's Day Collection",
+      "nota": "Día de la Madre",
+      "tono": "#b7a3c8"
+    },
+    {
+      "nombre": "Iced Latte Collection",
+      "nota": "Por temporada",
+      "tono": "#a47b62"
+    }
   ],
   "local": {
     "centro": "CC Albán Borja",
@@ -125,19 +531,62 @@
     "descripcion": "Una mesa larga para los talleres y repisas con las colecciones de temporada."
   },
   "faq": [
-    { "pregunta": "¿Dónde están?", "respuesta": "En el CC Albán Borja, local 38-9, en Guayaquil." },
-    { "pregunta": "¿Cuánto cuesta el taller?", "respuesta": "USD 25 por persona, con materiales incluidos. Cupos limitados." },
-    { "pregunta": "¿Desde cuántas personas puedo reservar para mi grupo?", "respuesta": "Los grupos son de 6 a 8 personas, a USD 25 por persona con materiales incluidos." },
-    { "pregunta": "¿Qué días se puede reservar para un grupo?", "respuesta": "De lunes a sábado. Separa tu fecha por WhatsApp." },
-    { "pregunta": "¿Hacen delivery?", "respuesta": null },
-    { "pregunta": "¿Con cuánta anticipación debo pedir?", "respuesta": null },
-    { "pregunta": "¿Qué formas de pago aceptan?", "respuesta": null },
-    { "pregunta": "¿Cuánto dura una vela?", "respuesta": null }
+    {
+      "pregunta": "¿Dónde están?",
+      "respuesta": "En el CC Albán Borja, local 38-9, en Guayaquil."
+    },
+    {
+      "pregunta": "¿Cuánto cuesta el taller?",
+      "respuesta": "USD 25 por persona, con materiales incluidos. Cupos limitados."
+    },
+    {
+      "pregunta": "¿Desde cuántas personas puedo reservar para mi grupo?",
+      "respuesta": "Los grupos son de 6 a 8 personas, a USD 25 por persona con materiales incluidos."
+    },
+    {
+      "pregunta": "¿Qué días se puede reservar para un grupo?",
+      "respuesta": "De lunes a sábado. Separa tu fecha por WhatsApp."
+    },
+    {
+      "pregunta": "¿Hacen delivery?",
+      "respuesta": null
+    },
+    {
+      "pregunta": "¿Con cuánta anticipación debo pedir?",
+      "respuesta": null
+    },
+    {
+      "pregunta": "¿Qué formas de pago aceptan?",
+      "respuesta": null
+    },
+    {
+      "pregunta": "¿Cuánto dura una vela?",
+      "respuesta": null
+    }
   ],
   "galeria": [],
   "galeria_placeholder": "Aquí van fotos reales de pedidos entregados, con permiso de Velati.",
   "medicion": {
     "meta_pixel_id": "",
     "ga4_id": ""
-  }
+  },
+  "precios_etiqueta_corta": "Precios referenciales",
+  "destacados": [
+    "bouquet-rosa",
+    "caja-x4",
+    "nomos-papa-noel",
+    "copos-pequenos"
+  ],
+  "firma": {
+    "texto": "Diseñado por",
+    "enlace": null
+  },
+  "marquee": [
+    "Christmas Collection",
+    "Velatines",
+    "Mother's Day Collection",
+    "Iced Latte Collection",
+    "Bouquets by Velati",
+    "Workshop de velas"
+  ]
 }

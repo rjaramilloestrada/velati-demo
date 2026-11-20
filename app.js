@@ -1,4 +1,4 @@
-/* Velati (demo). Todo el contenido sale de data.json. */
+/* Velati v2 (demo). Todo el contenido sale de data.json. */
 (() => {
   'use strict';
 
@@ -6,6 +6,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wideMQ = matchMedia('(min-width: 900px)');
+  const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
   const G = () => (!reduced && window.gsap) || null;
 
   const h = (tag, attrs = {}, ...kids) => {
@@ -20,24 +21,23 @@
     for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(c));
     return el;
   };
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem('velati:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem('velati:' + k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } }
+  };
 
   let D = null;
 
-  /* ---------- WhatsApp ---------- */
+  /* ---------- WhatsApp y medición ---------- */
   const waLink = text => `https://wa.me/${D.whatsapp}?text=${encodeURIComponent(text)}`;
   const waText = key => (D.mensajes && D.mensajes[key]) || key;
   function openWa(text, origen) {
     track('whatsapp_click', { origen });
     const url = waLink(text);
-    window.__lastWa = url; /* para pruebas */
+    window.__lastWa = url;
     const w = window.open(url, '_blank', 'noopener');
     if (!w) location.href = url;
   }
-  function bindWa(rootEl = document) {
-    $$('[data-wa]', rootEl).forEach(a => { a.href = waLink(waText(a.dataset.wa)); });
-  }
-
-  /* ---------- Medición (sin IDs no se inyecta nada) ---------- */
   const M = { fb: false, ga: false };
   function initMedicion() {
     const m = D.medicion || {};
@@ -52,25 +52,20 @@
         t = b.createElement(e); t.async = true; t.src = v;
         s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s);
       })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
-      window.fbq('init', pid);
-      window.fbq('track', 'PageView');
-      M.fb = true;
+      window.fbq('init', pid); window.fbq('track', 'PageView'); M.fb = true;
     }
     if (/^G-[A-Z0-9]{4,20}$/.test(gid)) {
       window.dataLayer = window.dataLayer || [];
       window.gtag = function () { window.dataLayer.push(arguments); };
-      window.gtag('js', new Date());
-      window.gtag('config', gid);
+      window.gtag('js', new Date()); window.gtag('config', gid);
       const s = document.createElement('script');
-      s.async = true;
-      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gid);
-      document.head.append(s);
-      M.ga = true;
+      s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gid);
+      document.head.append(s); M.ga = true;
     }
   }
   function track(name, params = {}) {
     try {
-      if (M.fb && window.fbq) window.fbq('track', name === 'form_submit' ? 'Lead' : 'Contact', params);
+      if (M.fb && window.fbq) window.fbq('track', name === 'form_submit' ? 'Lead' : name === 'add_to_cart' ? 'AddToCart' : 'Contact', params);
       if (M.ga && window.gtag) window.gtag('event', name, params);
     } catch (e) { /* la medición nunca rompe la página */ }
   }
@@ -82,16 +77,24 @@
   const fmtDate = iso => new Date(iso + 'T12:00:00').toLocaleDateString('es-EC', { weekday: 'long', day: 'numeric', month: 'long' });
   const fmtHour = t => t.replace(/^0/, '');
   const prod = id => D.productos.find(p => p.id === id);
+  const catName = id => (D.categorias.find(c => c.id === id) || {}).nombre || '';
+  const haptic = () => { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { /* nada */ } };
   let toastT = 0;
   function toast(msg) {
     const t = $('[data-toast]');
-    t.textContent = msg;
-    t.classList.add('is-on');
-    clearTimeout(toastT);
-    toastT = setTimeout(() => t.classList.remove('is-on'), 2200);
+    t.textContent = msg; t.classList.add('is-on');
+    clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('is-on'), 2200);
+  }
+  function countTo(el, to) {
+    const g = G();
+    const from = Number(el.dataset.v || 0);
+    el.dataset.v = to;
+    if (!g || from === to) { el.textContent = money(to); return; }
+    const o = { v: from };
+    g.to(o, { v: to, duration: .45, ease: 'power2.out', onUpdate: () => { el.textContent = money(Math.round(o.v)); }, onComplete: () => { el.textContent = money(to); } });
   }
 
-  /* ---------- Ilustraciones referenciales (SVG) ---------- */
+  /* ---------- Ilustraciones referenciales (respaldo sin foto) ---------- */
   const W = '#fbf6ef', V = '#6b1e33', R = '#9e2330', GD = '#c6a052', GR = '#5f7a57';
   const flame = (x, y) => `<ellipse cx="${x}" cy="${y}" rx="3.2" ry="6.5" fill="#f2b84b"/><ellipse cx="${x}" cy="${y + 2}" rx="1.4" ry="3" fill="#fff4cf"/>`;
   const ILLO = {
@@ -109,259 +112,339 @@
     taza: () => `<path d="M30 40h36v34a10 10 0 0 1-10 10H40a10 10 0 0 1-10-10z" fill="${W}"/><path d="M66 48h6a8 8 0 0 1 0 16h-6" stroke="${W}" stroke-width="5" fill="none"/><path d="M36 58l4-6 4 6 4-6 4 6 4-6 4 6" stroke="${R}" stroke-width="2" fill="none"/>`,
     bouquet: t => `<path d="M38 60l12 30 12-30z" fill="${W}"/><g fill="${t || '#e4a5ae'}">${[[40, 44], [60, 44], [50, 34], [44, 56], [56, 56], [50, 48]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9"/>`).join('')}</g><g fill="rgba(255,255,255,.45)">${[[40, 44], [60, 44], [50, 34], [50, 48]].map(([x, y]) => `<circle cx="${x - 2}" cy="${y - 2}" r="3"/>`).join('')}</g><path d="M30 52c-4-8 2-14 8-10M70 52c4-8-2-14-8-10" stroke="${GR}" stroke-width="3" fill="none"/><rect x="40" y="70" width="20" height="5" fill="${V}"/>`
   };
-  const illo = (p, cls = '') => `<svg class="illo ${cls}" viewBox="0 0 100 100" aria-hidden="true" focusable="false">${(ILLO[p.ilustracion] || ILLO.regalo)(p.tono)}</svg>`;
-
-  /* ---------- Marca y textos fijos ---------- */
-  function renderBase() {
-    const c = D.marca.colores;
-    const r = document.documentElement.style;
-    r.setProperty('--wine', c.vino); r.setProperty('--rose', c.rosa); r.setProperty('--cream', c.crema);
-    r.setProperty('--sage', c.salvia); r.setProperty('--lilac', c.lila); r.setProperty('--ink', c.tinta);
-    r.setProperty('--xred', c.navidad_rojo); r.setProperty('--gold', c.navidad_dorado);
-
-    const bar = $('[data-demo-bar]');
-    if (!D.demo.banner) bar.remove(); else $('[data-demo-text]').textContent = D.demo.texto;
-    $('[data-demo-text-foot]').textContent = D.demo.texto;
-    $('[data-hero-line]').textContent = D.hero.linea;
-    $('[data-hero-lead]').textContent = D.hero.bajada;
-    $$('[data-img-note]').forEach(e => { e.textContent = D.marca.nota_imagenes; });
-    $$('[data-precios-etiqueta]').forEach(e => { e.textContent = D.precios_etiqueta; });
-
-    const L = D.local;
-    const addr = `${L.centro}, local ${L.local}, ${L.ciudad}`;
-    $('[data-local-addr]').textContent = addr;
-    $('[data-foot-addr]').textContent = addr;
-    $('[data-local-desc]').textContent = L.descripcion;
-    $('[data-local-hours]').textContent = L.horario ? 'Horario: ' + L.horario : 'Horario: escríbenos y te contamos.';
-    $('[data-maps]').href = L.maps;
-
-    /* Flores del marco ovalado (firma de sus flyers) */
-    const fl = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})">${[0, 72, 144, 216, 288].map(a => `<ellipse transform="rotate(${a})" cx="0" cy="-7" rx="5" ry="8" fill="${col}"/>`).join('')}<circle r="3.5" fill="#f2d48a"/></g>`;
-    const leaf = (x, y, a) => `<ellipse transform="translate(${x} ${y}) rotate(${a})" rx="4" ry="10" fill="#8fa086"/>`;
-    $('[data-oval-flowers]').innerHTML =
-      `<ellipse cx="150" cy="190" rx="132" ry="176" fill="none" stroke="#6b1e33" stroke-width="1.5" opacity=".55"/>` +
-      `<ellipse cx="150" cy="190" rx="122" ry="166" fill="none" stroke="#6b1e33" stroke-width=".8" opacity=".35"/>` +
-      leaf(40, 72, -30) + leaf(56, 52, 20) + leaf(250, 312, 30) + leaf(236, 334, -20) + leaf(262, 70, 40) + leaf(36, 310, -40) +
-      fl(46, 56, 1.4, '#e4a5ae') + fl(70, 40, 1, '#b7a3c8') + fl(28, 92, .9, '#f4dfdc') +
-      fl(254, 324, 1.4, '#e4a5ae') + fl(228, 344, 1, '#b7a3c8') + fl(272, 290, .9, '#f4dfdc') +
-      fl(262, 54, .8, '#b7a3c8') + fl(40, 330, .8, '#e4a5ae');
+  const illo = p => `<svg class="illo" viewBox="0 0 100 100" aria-hidden="true" focusable="false">${(ILLO[p.ilustracion] || ILLO.regalo)(p.tono)}</svg>`;
+  /* Arte del producto: foto si existe (con srcset), si no ilustración */
+  function art(p, big) {
+    const f = p.fotos && p.fotos[0];
+    if (f) {
+      const img = (x, cls) => `<img class="ph ${cls}" src="${x.src}"${x.src2x ? ` srcset="${x.src} 480w, ${x.src2x} 960w" sizes="${big ? '(min-width:900px) 480px, 100vw' : '(min-width:900px) 260px, 50vw'}"` : ''} alt="${(x.alt || p.nombre).replace(/"/g, '&quot;')}" loading="lazy" width="480" height="600" onload="this.classList.add('is-in')">`;
+      return img(f, 'art__a') + (p.fotos[1] ? img(p.fotos[1], 'art__b') : '');
+    }
+    return `<span class="art__glow"></span>${illo(p)}`;
   }
 
-  /* ---------- 3a. Arma tu regalo ---------- */
-  const gift = { qty: {}, pres: 'sin-caja', filtro: 'todos' };
-  const pickable = () => D.productos.filter(p => p.categoria !== 'caja' && p.estado !== 'proximamente' && p.precio != null);
+  /* ---------- Carrito (estado único: catálogo + regalo) ---------- */
+  const cart = Object.assign({ qty: {}, pres: 'sin-caja', para: '', msg: '', de: '' }, store.get('cart', {}));
+  const saveCart = () => store.set('cart', cart);
+  const sellable = p => p && p.estado !== 'proximamente' && p.precio != null;
   function lineCalc(p, q) {
     if (p.oferta && q >= p.oferta.cantidad) {
       const packs = Math.floor(q / p.oferta.cantidad);
-      const rest = q % p.oferta.cantidad;
-      return { total: packs * p.oferta.precio + rest * p.precio, oferta: true };
+      return { total: packs * p.oferta.precio + (q % p.oferta.cantidad) * p.precio, oferta: true };
     }
     return { total: q * p.precio, oferta: false };
   }
-  function giftTotals() {
-    const lines = Object.entries(gift.qty).filter(([, q]) => q > 0).map(([id, q]) => {
+  function totals() {
+    const lines = Object.entries(cart.qty).filter(([id, q]) => q > 0 && sellable(prod(id))).map(([id, q]) => {
       const p = prod(id);
       return { p, q, ...lineCalc(p, q) };
     });
-    const pres = D.presentaciones.find(x => x.id === gift.pres);
-    const presP = pres && pres.producto ? prod(pres.producto) : null;
+    const pres = D.presentaciones.find(x => x.id === cart.pres) || D.presentaciones[0];
+    const presP = pres.producto ? prod(pres.producto) : null;
+    const n = lines.reduce((s, l) => s + l.q, 0);
     const total = lines.reduce((s, l) => s + l.total, 0) + (presP ? presP.precio : 0);
-    return { lines, pres, presP, total };
+    return { lines, pres, presP, n, total };
+  }
+  function addToCart(id, q = 1, fromEl) {
+    const p = prod(id);
+    if (!sellable(p)) return;
+    if (p.categoria === 'caja') {
+      cart.pres = p.id;
+      toast(`${p.nombre} va como caja de tu regalo 🎁`);
+    } else {
+      cart.qty[id] = Math.min(30, (cart.qty[id] || 0) + q);
+      toast(`Agregaste ${q > 1 ? q + ' x ' : ''}${p.nombre} 💗`);
+    }
+    saveCart(); haptic();
+    track('add_to_cart', { id });
+    if (fromEl) flyToCart(fromEl);
+    renderCart(true);
+  }
+  function setQty(id, q) {
+    cart.qty[id] = Math.max(0, Math.min(30, q));
+    if (!cart.qty[id]) delete cart.qty[id];
+    saveCart(); renderCart(true);
+  }
+  function setPres(id) { cart.pres = id; saveCart(); renderCart(true); }
+
+  /* Miniatura que vuela en arco hasta la bolsa */
+  function flyToCart(fromEl) {
+    const g = G();
+    const targets = $$('[data-open-cart]').filter(b => b.offsetParent !== null);
+    const to = targets[0];
+    if (!g || !to) return bump();
+    const a = fromEl.getBoundingClientRect();
+    const b = to.getBoundingClientRect();
+    const s = Math.min(a.width, 90);
+    const ghost = h('div', { class: 'ghost', html: fromEl.innerHTML });
+    Object.assign(ghost.style, { left: a.left + a.width / 2 - s / 2 + 'px', top: a.top + a.height / 2 - s / 2 + 'px', width: s + 'px', height: s + 'px' });
+    document.body.append(ghost);
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2);
+    const dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    g.timeline({ onComplete: () => { ghost.remove(); bump(); } })
+      .to(ghost, { x: dx, duration: .7, ease: 'power1.inOut' }, 0)
+      .to(ghost, { y: dy, duration: .7, ease: 'back.in(1.6)' }, 0)
+      .to(ghost, { scale: .2, opacity: .6, rotate: 20, duration: .7, ease: 'power2.in' }, 0);
+  }
+  function bump() {
+    const g = G();
+    if (g) g.fromTo('.cartbtn, .dock__n', { scale: 1 }, { scale: 1.25, duration: .15, yoyo: true, repeat: 1, ease: 'power2.out' });
   }
 
-  function renderBuilder() {
-    const cats = D.categorias.filter(c => c.id === 'todos' || pickable().some(p => p.categoria === c.id));
-    const bf = $('[data-bfilter]');
-    cats.forEach(c => bf.append(h('button', { type: 'button', class: 'fchip', 'aria-pressed': String(c.id === 'todos'), 'data-cat': c.id, onclick: () => {
-      gift.filtro = c.id;
-      $$('.fchip', bf).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c.id)));
-      $$('[data-pick]').forEach(li => { li.hidden = !(c.id === 'todos' || li.dataset.cat === c.id); });
-    } }, c.nombre)));
-
-    const ul = $('[data-picker]');
-    pickable().forEach(p => {
-      const li = h('li', { class: 'pick', 'data-pick': p.id, 'data-cat': p.categoria });
-      li.innerHTML = `${illo(p, 'pick__img')}<div class="pick__txt"><b>${p.nombre}</b><small>${p.descripcion}</small><span class="pick__price">${money(p.precio)}${p.oferta ? ` <em class="badge">${p.oferta.cantidad} x ${money(p.oferta.precio)}</em>` : ''}</span></div>`;
-      const st = h('div', { class: 'stepper stepper--sm', role: 'group', 'aria-label': 'Cantidad de ' + p.nombre },
-        h('button', { type: 'button', 'aria-label': 'Quitar ' + p.nombre, onclick: () => setQty(p.id, -1) }, '−'),
-        h('output', { 'data-q': p.id, 'aria-live': 'polite' }, '0'),
-        h('button', { type: 'button', 'aria-label': 'Agregar ' + p.nombre, onclick: e => setQty(p.id, 1, e.currentTarget) }, '+'));
-      li.append(st);
+  function renderCart(animate) {
+    const t = totals();
+    $$('[data-cart-n]').forEach(e => { e.textContent = t.n; e.classList.toggle('is-on', t.n > 0); });
+    /* Paso 1: líneas */
+    const ul = $('[data-clines]');
+    ul.innerHTML = '';
+    t.lines.forEach(l => {
+      const li = h('li', { class: 'cline' },
+        h('span', { class: 'cline__art', html: art(l.p) }),
+        h('span', { class: 'cline__txt' },
+          h('b', {}, l.p.nombre),
+          h('small', {}, l.oferta ? `Oferta ${l.p.oferta.cantidad} x ${money(l.p.oferta.precio)} aplicada` : `${money(l.p.precio)} c/u`)),
+        h('div', { class: 'stepper stepper--sm', role: 'group', 'aria-label': 'Cantidad de ' + l.p.nombre },
+          h('button', { type: 'button', 'aria-label': 'Quitar ' + l.p.nombre, onclick: () => setQty(l.p.id, l.q - 1) }, '−'),
+          h('output', {}, String(l.q)),
+          h('button', { type: 'button', 'aria-label': 'Agregar ' + l.p.nombre, onclick: () => setQty(l.p.id, l.q + 1) }, '+')),
+        h('b', { class: 'cline__p' }, money(l.total)));
       ul.append(li);
     });
-
-    const pr = $('[data-pres]');
-    D.presentaciones.forEach(x => {
-      const pp = x.producto ? prod(x.producto) : null;
-      const lab = h('label', { class: 'presopt' },
-        h('input', { type: 'radio', name: 'pres', value: x.id, checked: x.id === gift.pres, onchange: () => setPres(x.id) }),
-        h('span', { class: 'presopt__in' },
-          h('b', {}, x.nombre),
-          h('small', {}, x.descripcion),
-          h('span', { class: 'presopt__p' }, pp ? money(pp.precio) : 'Sin costo extra')));
-      pr.append(lab);
+    $('[data-cempty]').hidden = t.lines.length > 0;
+    /* Paso 2: caja */
+    $$('input[name="pres"]').forEach(i => { i.checked = i.value === cart.pres; });
+    /* Pasos activos */
+    $$('[data-ds]').forEach(li => {
+      const n = li.dataset.ds;
+      li.classList.toggle('is-done', (n === '1' && t.n > 0) || (n === '2' && t.n > 0) || (n === '3' && !!(cart.msg || cart.para)));
     });
-
-    $('[data-card-head]').textContent = D.tarjeta.encabezado;
-    const msg = $('[data-g-msg]');
-    msg.maxLength = D.tarjeta.max;
-    const cnt = () => { $('[data-g-count]').textContent = `(${msg.value.length}/${D.tarjeta.max})`; };
-    cnt();
-    msg.addEventListener('input', () => { cnt(); updateCard(); });
-    $('[data-g-para]').addEventListener('input', updateCard);
-    $('[data-g-de]').addEventListener('input', updateCard);
-    $('[data-send-gift]').addEventListener('click', sendGift);
-    updateCard();
-    updateSummary();
-  }
-
-  function setQty(id, d, from) {
-    const q = Math.max(0, Math.min(20, (gift.qty[id] || 0) + d));
-    gift.qty[id] = q;
-    const o = $(`[data-q="${id}"]`);
-    if (o) o.textContent = q;
-    const li = $(`[data-pick="${id}"]`);
-    if (li) li.classList.toggle('is-on', q > 0);
-    if (d > 0) dropAnim(prod(id), from);
-    $('[data-gift-err]').hidden = true;
-    updateSummary();
-  }
-  function setPres(id) {
-    gift.pres = id;
-    $$('input[name="pres"]').forEach(i => { i.checked = i.value === id; });
-    const box = $('[data-gb-box]');
-    box.classList.toggle('is-xmas', id !== 'sin-caja');
-    const g = G();
-    if (g) g.fromTo(box, { scale: .92 }, { scale: 1, duration: .5, ease: 'back.out(3)' });
-    updateSummary();
-  }
-  function dropAnim(p) {
-    const items = $('[data-gb-items]');
-    const n = Object.values(gift.qty).reduce((s, q) => s + q, 0);
-    if (items.children.length < 7) {
-      const el = h('span', { class: 'gb-item', html: illo(p) });
-      items.append(el);
-      const g = G();
-      if (g) g.fromTo(el, { y: -150, rotate: -25, opacity: 0 }, { y: 0, rotate: (n % 2 ? 6 : -6), opacity: 1, duration: .75, ease: 'bounce.out' });
-    } else {
-      const g = G();
-      if (g) g.fromTo($('[data-gb-box]'), { y: 0 }, { y: 4, duration: .12, yoyo: true, repeat: 1 });
-    }
-  }
-  function syncGiftItems() {
-    const items = $('[data-gb-items]');
-    const want = [];
-    Object.entries(gift.qty).forEach(([id, q]) => { for (let i = 0; i < q; i++) want.push(id); });
-    if (want.length < items.children.length) {
-      items.innerHTML = '';
-      want.slice(0, 7).forEach((id, i) => items.append(h('span', { class: 'gb-item', style: `transform:rotate(${i % 2 ? 6 : -6}deg)`, html: illo(prod(id)) })));
-    }
-  }
-  function updateSummary() {
-    syncGiftItems();
-    const t = giftTotals();
-    const ul = $('[data-lines]');
-    ul.innerHTML = '';
-    t.lines.forEach(l => ul.append(h('li', {},
-      h('span', {}, `${l.q} x ${l.p.nombre}`, l.oferta ? h('em', { class: 'badge' }, `oferta ${l.p.oferta.cantidad} x ${money(l.p.oferta.precio)}`) : null),
-      h('b', {}, money(l.total)))));
-    if (t.presP) ul.append(h('li', { class: 'lines__pres' }, h('span', {}, t.pres.nombre), h('b', {}, money(t.presP.precio))));
-    $('[data-empty]').hidden = t.lines.length > 0 || !!t.presP;
-    $('[data-total]').textContent = money(t.total);
-    const n = t.lines.reduce((s, l) => s + l.q, 0);
-    $('[data-giftbar-txt]').textContent = `🎁 ${n} ${n === 1 ? 'pieza' : 'piezas'} · ${money(t.total)}`;
-    giftbarSync();
+    countTo($('[data-total]'), t.total);
     $('[data-total-note]').textContent = D.precios_etiqueta + '. Se confirman por WhatsApp.';
-    const g = G();
-    if (g) g.fromTo('[data-total]', { scale: 1.15 }, { scale: 1, duration: .35, ease: 'power2.out' });
-  }
-  let regaloVisible = false, summaryVisible = false;
-  function giftbarSync() {
-    const n = Object.values(gift.qty).reduce((s, q) => s + q, 0);
-    $('[data-giftbar]').classList.toggle('is-on', n > 0 && regaloVisible && !summaryVisible);
-  }
-  function watchGiftbar() {
-    if (!('IntersectionObserver' in window)) return;
-    new IntersectionObserver(([e]) => { regaloVisible = e.isIntersecting; giftbarSync(); }).observe($('.builder__steps'));
-    new IntersectionObserver(([e]) => { summaryVisible = e.isIntersecting; giftbarSync(); }, { threshold: .15 }).observe($('.summary'));
+    updateCard();
+    if (animate) bump();
   }
   function updateCard() {
-    const para = $('[data-g-para]').value.trim();
-    const msg = $('[data-g-msg]').value.trim();
-    const de = $('[data-g-de]').value.trim();
-    $('[data-card-para]').textContent = 'Para ' + (para || 'alguien especial');
-    $('[data-card-msg]').textContent = msg || 'Tu mensaje aparece aquí mientras escribes…';
-    $('[data-card-msg]').classList.toggle('is-ph', !msg);
-    $('[data-card-de]').textContent = de ? 'Con cariño, ' + de : '';
+    $('[data-card-para]').textContent = 'Para ' + (cart.para.trim() || 'alguien especial');
+    $('[data-card-msg]').textContent = cart.msg.trim() || 'Tu mensaje aparece aquí mientras escribes…';
+    $('[data-card-msg]').classList.toggle('is-ph', !cart.msg.trim());
+    $('[data-card-de]').textContent = cart.de.trim() ? 'Con cariño, ' + cart.de.trim() : '';
   }
   function giftMessage() {
-    const t = giftTotals();
+    const t = totals();
     const out = [waText('regalo_titulo'), ''];
     t.lines.forEach(l => out.push(`• ${l.q} x ${l.p.nombre}: ${money(l.total)}${l.oferta ? ` (oferta ${l.p.oferta.cantidad} x ${money(l.p.oferta.precio)})` : ''}`));
     out.push(`Presentación: ${t.pres.nombre}${t.presP ? ` (${money(t.presP.precio)})` : ''}`);
     out.push(`Total referencial: ${money(t.total)}`);
-    const para = $('[data-g-para]').value.trim();
-    const msg = $('[data-g-msg]').value.trim();
-    const de = $('[data-g-de]').value.trim();
+    const para = cart.para.trim(), msg = cart.msg.trim(), de = cart.de.trim();
     if (para || msg || de) {
       out.push('', 'Tarjeta:');
       if (para) out.push('Para: ' + para);
       if (msg) out.push('Mensaje: ' + msg);
       if (de) out.push('De: ' + de);
     }
-    out.push('', `(${D.precios_etiqueta}, por confirmar) ✨`);
+    out.push('', `${D.precios_etiqueta} ✨`);
     return out.join('\n');
   }
-  function sendGift() {
-    if (!giftTotals().lines.length) {
-      $('[data-gift-err]').hidden = false;
-      toast('Elige al menos una vela 💗');
-      return;
-    }
-    track('form_submit', { tipo: 'regalo' });
-    openWa(giftMessage(), 'regalo');
+  function miniCard(p) {
+    const li = h('li', { class: 'mini' });
+    const b = h('button', { type: 'button', class: 'mini__art', 'aria-label': 'Ver ' + p.nombre, html: art(p), onclick: () => openSheet(p.id) });
+    li.append(b, h('span', { class: 'mini__t' }, p.nombre), h('span', { class: 'mini__p' }, money(p.precio)),
+      h('button', { type: 'button', class: 'plus', 'aria-label': 'Agregar ' + p.nombre, onclick: () => addToCart(p.id, 1, b) }, '+'));
+    return li;
   }
 
-  /* ---------- 4. Colección Navidad ---------- */
-  function renderGrid() {
-    const navidad = D.productos.filter(p => p.coleccion === 'navidad');
-    const f = $('[data-filters]');
-    D.categorias.filter(c => c.id === 'todos' || navidad.some(p => p.categoria === c.id)).forEach(c =>
-      f.append(h('button', { type: 'button', class: 'fchip fchip--gold', 'aria-pressed': String(c.id === 'todos'), 'data-cat': c.id, onclick: () => {
-        $$('.fchip', f).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c.id)));
-        $$('[data-card]').forEach(li => { li.hidden = !(c.id === 'todos' || li.dataset.cat === c.id); });
-        const g = G();
-        if (g) g.fromTo($$('[data-card]:not([hidden])'), { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: .4, stagger: .03, ease: 'power2.out' });
-      } }, c.nombre)));
+  /* ---------- Drawer ---------- */
+  let lastFocus = null;
+  function openDrawer(step) {
+    const d = $('[data-drawer]');
+    lastFocus = document.activeElement;
+    d.hidden = false;
+    document.documentElement.classList.add('is-locked');
+    requestAnimationFrame(() => d.classList.add('is-open'));
+    renderCart();
+    const panel = $('[data-drawer-panel]');
+    panel.focus({ preventScroll: true });
+    if (step) { const sec = $(`[data-dsec="${step}"]`); if (sec) $('[data-drawer-body]').scrollTop = sec.offsetTop - 70; }
+  }
+  function closeDrawer() {
+    const d = $('[data-drawer]');
+    if (d.hidden) return;
+    d.classList.remove('is-open');
+    document.documentElement.classList.remove('is-locked');
+    setTimeout(() => { d.hidden = true; }, reduced ? 0 : 380);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  function initDrawer() {
+    const pr = $('[data-pres]');
+    D.presentaciones.forEach(x => {
+      const pp = x.producto ? prod(x.producto) : null;
+      pr.append(h('label', { class: 'presopt' },
+        h('input', { type: 'radio', name: 'pres', value: x.id, checked: x.id === cart.pres, onchange: () => setPres(x.id) }),
+        h('span', { class: 'presopt__in' },
+          h('span', { class: 'presopt__art', html: pp ? art(pp) : '<span class="presopt__none">sin<br>caja</span>' }),
+          h('span', { class: 'presopt__txt' }, h('b', {}, x.nombre), h('small', {}, x.descripcion)),
+          h('span', { class: 'presopt__p' }, pp ? money(pp.precio) : 'Gratis'))));
+    });
+    $('[data-card-head]').textContent = D.tarjeta.encabezado;
+    const bind = (sel, key) => {
+      const el = $(sel);
+      el.value = cart[key] || '';
+      el.addEventListener('input', () => { cart[key] = el.value; saveCart(); updateCard(); cnt(); renderStepsOnly(); });
+    };
+    const msg = $('[data-g-msg]');
+    msg.maxLength = D.tarjeta.max;
+    const cnt = () => { $('[data-g-count]').textContent = `(${msg.value.length}/${D.tarjeta.max})`; };
+    bind('[data-g-para]', 'para'); bind('[data-g-msg]', 'msg'); bind('[data-g-de]', 'de'); cnt();
+    const renderStepsOnly = () => $('[data-ds="3"]').classList.toggle('is-done', !!(cart.msg || cart.para));
+    const picks = $('[data-cempty-picks]');
+    D.destacados.map(prod).filter(p => sellable(p) && p.categoria !== 'caja').forEach(p => picks.append(miniCard(p)));
+    $('[data-send-gift]').addEventListener('click', () => {
+      if (!totals().lines.length) { $('[data-gift-err]').hidden = false; toast('Elige al menos una vela 💗'); return; }
+      $('[data-gift-err]').hidden = true;
+      track('form_submit', { tipo: 'regalo' });
+      openWa(giftMessage(), 'regalo');
+    });
+    /* Paso activo según el scroll del drawer */
+    const body = $('[data-drawer-body]');
+    body.addEventListener('scroll', () => {
+      let cur = '1';
+      $$('[data-dsec]').forEach(s => { if (s.offsetTop - 120 <= body.scrollTop) cur = s.dataset.dsec; });
+      $$('[data-ds]').forEach(li => li.classList.toggle('is-on', li.dataset.ds === cur));
+    }, { passive: true });
+    $$('[data-ds]').forEach(li => li.addEventListener('click', () => { const s = $(`[data-dsec="${li.dataset.ds}"]`); body.scrollTo({ top: s.offsetTop - 70, behavior: reduced ? 'auto' : 'smooth' }); }));
+    $$('[data-open-cart]').forEach(b => b.addEventListener('click', () => openDrawer()));
+    $$('[data-open-gift]').forEach(b => b.addEventListener('click', () => openDrawer(totals().n ? null : '1')));
+    $$('[data-close-cart]').forEach(b => b.addEventListener('click', closeDrawer));
+  }
+
+  /* ---------- Catálogo ---------- */
+  const view = { cat: 'todos', budget: 'all', sort: 'rec' };
+  const BUDGETS = [
+    { id: 'all', nombre: 'Todo precio', ok: () => true },
+    { id: 'b10', nombre: 'Hasta $10', ok: p => p.precio != null && p.precio <= 10 },
+    { id: 'b25', nombre: '$11 a $25', ok: p => p.precio != null && p.precio > 10 && p.precio <= 25 },
+    { id: 'b26', nombre: 'Más de $25', ok: p => p.precio != null && p.precio > 25 }
+  ];
+  const catalog = () => D.productos.filter(p => p.coleccion === 'navidad');
+  function renderCatalog() {
+    const all = catalog();
+    const cats = $('[data-cats]');
+    D.categorias.filter(c => c.id === 'todos' || all.some(p => p.categoria === c.id)).forEach(c => {
+      const n = c.id === 'todos' ? all.length : all.filter(p => p.categoria === c.id).length;
+      cats.append(h('button', { type: 'button', class: 'fchip', 'aria-pressed': String(c.id === view.cat), 'data-cat': c.id, onclick: () => { view.cat = c.id; applyView(true); } }, c.nombre, h('small', {}, String(n))));
+    });
+    const bud = $('[data-budget]');
+    BUDGETS.forEach(b => bud.append(h('button', { type: 'button', class: 'bchip', 'aria-pressed': String(b.id === view.budget), 'data-b': b.id, onclick: () => { view.budget = b.id; applyView(true); } }, b.nombre)));
+    $('[data-sort]').addEventListener('change', e => { view.sort = e.target.value; applyView(true); });
 
     const ul = $('[data-grid]');
-    navidad.forEach(p => {
-      const soon = p.estado === 'proximamente';
-      const li = h('li', { class: 'card' + (soon ? ' is-soon' : ''), 'data-card': p.id, 'data-cat': p.categoria });
-      li.innerHTML = `<div class="card__art">${illo(p)}${soon ? '<span class="card__tag">Próximamente</span>' : ''}${p.oferta ? `<span class="card__tag card__tag--gold">${p.oferta.cantidad} x ${money(p.oferta.precio)}</span>` : ''}</div>
-        <div class="card__body"><h3>${p.nombre}</h3><p>${p.descripcion}</p><p class="card__price">${p.precio != null ? money(p.precio) : (p.precio_texto || '')}</p></div>`;
-      if (!soon) {
-        li.append(h('button', { type: 'button', class: 'btn btn--gold btn--sm btn--block', onclick: () => addFromCatalog(p) }, 'Agregar al regalo'));
-      }
+    all.forEach((p, i) => {
+      const soon = !sellable(p);
+      const seals = [...(p.sellos || [])];
+      if (p.oferta) seals.push(`${p.oferta.cantidad} x ${money(p.oferta.precio)}`);
+      if (soon) seals.unshift('Próximamente');
+      const li = h('li', { class: 'card' + (soon ? ' is-soon' : ''), 'data-card': p.id, 'data-i': i });
+      const artBtn = h('button', { type: 'button', class: 'card__art' + (p.fotos && p.fotos[1] ? ' has-b' : ''), style: p.tono ? `--tone:${p.tono}` : null, 'aria-label': 'Ver ' + p.nombre, html: art(p), onclick: () => openSheet(p.id) });
+      li.append(artBtn,
+        h('div', { class: 'card__seals' }, seals.map(s => h('span', { class: 'seal' + (s === 'Próximamente' ? ' seal--soon' : '') }, s))),
+        h('div', { class: 'card__body' },
+          h('p', { class: 'card__cat' }, catName(p.categoria)),
+          h('h3', {}, h('button', { type: 'button', class: 'card__name', onclick: () => openSheet(p.id) }, p.nombre)),
+          h('p', { class: 'card__d' }, p.descripcion),
+          h('p', { class: 'card__price' }, p.precio != null ? money(p.precio) : (p.precio_texto || ''))),
+        soon ? null : h('button', { type: 'button', class: 'plus plus--card', 'aria-label': 'Agregar ' + p.nombre, onclick: () => addToCart(p.id, 1, artBtn) }, '+'));
       ul.append(li);
     });
-    $('[data-grid-note]').textContent = D.marca.nota_imagenes + ' Las tazas estaban anunciadas como "próximamente" y no se pueden agregar.';
+    $('[data-grid-note]').textContent = D.marca.nota_imagenes;
+    applyView(false);
   }
-  function addFromCatalog(p) {
-    if (p.categoria === 'caja') {
-      setPres(p.id);
-      toast(`${p.nombre} va como presentación de tu regalo 🎁`);
-    } else {
-      setQty(p.id, 1);
-      toast(`Agregaste ${p.nombre} a tu regalo 💗`);
-    }
+  function applyView(animate) {
+    $$('[data-cat]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === view.cat)));
+    $$('[data-b]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.b === view.budget)));
+    const okB = BUDGETS.find(b => b.id === view.budget).ok;
+    const ul = $('[data-grid]');
+    const cards = $$('[data-card]', ul);
+    const visible = [];
+    cards.forEach(li => {
+      const p = prod(li.dataset.card);
+      const on = (view.cat === 'todos' || p.categoria === view.cat) && okB(p);
+      li.hidden = !on;
+      if (on) visible.push(li);
+    });
+    const key = li => { const p = prod(li.dataset.card); return p.precio == null ? 1e9 : p.precio; };
+    const sorted = [...cards].sort((a, b) => view.sort === 'rec' ? a.dataset.i - b.dataset.i : view.sort === 'asc' ? key(a) - key(b) : (key(b) === 1e9 ? -1e9 : key(b)) - (key(a) === 1e9 ? -1e9 : key(a)));
+    sorted.forEach(li => ul.append(li));
+    const n = visible.length;
+    $('[data-count]').textContent = n ? `${n} ${n === 1 ? 'producto' : 'productos'}` : 'No hay productos con ese filtro. Prueba otro precio.';
+    const g = G();
+    if (animate && g) g.fromTo(visible, { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .45, stagger: .025, ease: 'power2.out', overwrite: true });
   }
 
-  /* ---------- 3b. Reservas ---------- */
+  /* ---------- Ficha de producto ---------- */
+  const sheetState = { id: null, q: 1 };
+  function openSheet(id, fromHash) {
+    const p = prod(id);
+    if (!p) return;
+    sheetState.id = id; sheetState.q = 1;
+    const s = $('[data-sheet]');
+    $('[data-sheet-art]').innerHTML = art(p, true);
+    if (p.tono) $('[data-sheet-art]').style.setProperty('--tone', p.tono); else $('[data-sheet-art]').style.removeProperty('--tone');
+    $('[data-sheet-cat]').textContent = catName(p.categoria) + ' · Christmas Collection';
+    $('[data-sheet-t]').textContent = p.nombre;
+    $('[data-sheet-d]').textContent = p.descripcion;
+    $('[data-sheet-p]').textContent = p.precio != null ? money(p.precio) : (p.precio_texto || '');
+    $('[data-sheet-offer]').textContent = p.oferta ? `Oferta: ${p.oferta.cantidad} x ${money(p.oferta.precio)}. Se aplica sola en tu pedido.` : '';
+    const vr = $('[data-sheet-var]');
+    vr.innerHTML = '';
+    if (p.variantes && p.variantes.length) vr.append(h('p', { class: 'lbl' }, 'Opciones'), h('div', { class: 'occ' }, p.variantes.map(v => h('span', { class: 'fchip' }, v))));
+    const soon = !sellable(p);
+    $('[data-sheet-buy]').hidden = soon;
+    $('[data-sheet-soon]').hidden = !soon;
+    $('[data-sheet-note]').textContent = `${D.precios_etiqueta}. ${p.fotos && p.fotos.length ? '' : D.marca.nota_imagenes}`;
+    const url = location.origin + location.pathname + '#p/' + p.id;
+    $('[data-sheet-share]').href = 'https://wa.me/?text=' + encodeURIComponent(`Mira esta vela de Velati 💗 ${p.nombre}: ${url}`);
+    sheetQty();
+    if (!fromHash && location.hash !== '#p/' + id) history.replaceState(null, '', '#p/' + id);
+    lastFocus = document.activeElement;
+    s.hidden = false;
+    document.documentElement.classList.add('is-locked');
+    requestAnimationFrame(() => s.classList.add('is-open'));
+    $('[data-sheet-panel]').focus({ preventScroll: true });
+  }
+  function sheetQty() {
+    const p = prod(sheetState.id);
+    $('[data-sq]').textContent = sheetState.q;
+    $('[data-sq-minus]').disabled = sheetState.q <= 1;
+    if (sellable(p)) $('[data-sheet-sum]').textContent = money(lineCalc(p, sheetState.q).total);
+  }
+  function closeSheet() {
+    const s = $('[data-sheet]');
+    if (s.hidden) return;
+    s.classList.remove('is-open');
+    document.documentElement.classList.remove('is-locked');
+    setTimeout(() => { s.hidden = true; }, reduced ? 0 : 360);
+    if (location.hash.startsWith('#p/')) history.replaceState(null, '', location.pathname + location.search);
+    if (lastFocus) lastFocus.focus({ preventScroll: true });
+  }
+  function initSheet() {
+    $('[data-sq-minus]').addEventListener('click', () => { sheetState.q = Math.max(1, sheetState.q - 1); sheetQty(); });
+    $('[data-sq-plus]').addEventListener('click', () => { sheetState.q = Math.min(30, sheetState.q + 1); sheetQty(); });
+    $('[data-sheet-add]').addEventListener('click', () => {
+      const art = $('[data-sheet-art]');
+      addToCart(sheetState.id, sheetState.q, art);
+      setTimeout(closeSheet, 250);
+    });
+    $$('[data-close-sheet]').forEach(b => b.addEventListener('click', closeSheet));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDrawer(); } });
+    const fromHash = () => { const m = location.hash.match(/^#p\/([\w-]+)$/); if (m && prod(m[1])) openSheet(m[1], true); };
+    addEventListener('hashchange', fromHash);
+    fromHash();
+  }
+
+  /* ---------- Reservas (lógica de la v1) ---------- */
   const res = { tab: 'taller', tPers: 1, tFecha: null, gPers: 6, occ: '' };
   const taller = () => D.talleres[0];
   const futuras = () => taller().fechas.filter(f => f.fecha >= todayISO()).sort((a, b) => a.fecha.localeCompare(b.fecha));
-
   function renderReserva() {
     const T = taller();
     $('[data-t-kicker]').textContent = `USD ${T.precio} por persona · incluye ${T.incluye}`;
@@ -388,7 +471,7 @@
     clampT();
 
     const Gp = D.grupos;
-    $('[data-g-meta]').textContent = `De ${Gp.min} a ${Gp.max} personas · lunes a sábado · USD ${Gp.precio_persona} por persona · incluye ${Gp.incluye} · ${Gp.cupos_texto.toLowerCase()}`;
+    $('[data-g-meta]').textContent = `De ${Gp.min} a ${Gp.max} personas · lunes a sábado · USD ${Gp.precio_persona} por persona · incluye ${Gp.incluye}`;
     res.gPers = Gp.min;
     $('[data-gr-minus]').addEventListener('click', () => { res.gPers--; clampG(); });
     $('[data-gr-plus]').addEventListener('click', () => { res.gPers++; clampG(); });
@@ -397,40 +480,33 @@
     fe.addEventListener('change', checkFecha);
     fe.addEventListener('input', checkFecha);
     const occ = $('[data-gr-occ]');
-    Gp.ocasiones.forEach(o => occ.append(h('button', { type: 'button', class: 'fchip', role: 'radio', 'aria-checked': 'false', onclick: e => {
+    Gp.ocasiones.forEach(o => occ.append(h('button', { type: 'button', class: 'fchip', role: 'radio', 'aria-checked': 'false', onclick: () => {
       res.occ = res.occ === o ? '' : o;
       $$('.fchip', occ).forEach(b => b.setAttribute('aria-checked', String(b.textContent === res.occ)));
     } }, o)));
     $('[data-send-grupo]').addEventListener('click', sendGrupo);
     clampG();
 
-    /* Pestañas */
     const tabs = $$('[data-tab]');
     tabs.forEach(t => {
       t.addEventListener('click', () => setTab(t.dataset.tab));
       t.addEventListener('keydown', e => {
         if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-        const i = tabs.indexOf(t);
-        const n = tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
+        const n = tabs[(tabs.indexOf(t) + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length];
         setTab(n.dataset.tab); n.focus();
       });
     });
-    $$('[data-tab-go]').forEach(a => a.addEventListener('click', () => setTab(a.dataset.tabGo)));
     addEventListener('resize', () => setTab(res.tab, true));
     setTab('taller', true);
   }
   function setTab(id, instant) {
     res.tab = id;
-    $$('[data-tab]').forEach(t => {
-      const on = t.dataset.tab === id;
-      t.setAttribute('aria-selected', String(on));
-      t.tabIndex = on ? 0 : -1;
-    });
+    $$('[data-tab]').forEach(t => { const on = t.dataset.tab === id; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; });
     $$('[data-panel]').forEach(p => { p.hidden = p.dataset.panel !== id; });
     const t = $(`[data-tab="${id}"]`);
     const ind = $('[data-tabs-ind]');
     ind.style.width = t.offsetWidth + 'px';
-    ind.style.transform = `translateX(${t.offsetLeft}px)`;
+    ind.style.transform = `translateX(${t.offsetLeft - 5}px)`;
     const g = G();
     if (g && !instant) g.fromTo(`[data-panel="${id}"] .frame`, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .45, ease: 'power2.out' });
   }
@@ -457,14 +533,8 @@
     const err = $('[data-gr-fecha-err]');
     err.hidden = true;
     if (!fe.value) return true;
-    if (fe.value < fe.min) {
-      err.textContent = 'Elige una fecha a partir de mañana.';
-      err.hidden = false; fe.value = ''; return false;
-    }
-    if (new Date(fe.value + 'T12:00:00').getDay() === 0) {
-      err.textContent = 'Los domingos no hay grupos. Elige de lunes a sábado.';
-      err.hidden = false; fe.value = ''; return false;
-    }
+    if (fe.value < fe.min) { err.textContent = 'Elige una fecha a partir de mañana.'; err.hidden = false; fe.value = ''; return false; }
+    if (new Date(fe.value + 'T12:00:00').getDay() === 0) { err.textContent = 'Los domingos no hay grupos. Elige de lunes a sábado.'; err.hidden = false; fe.value = ''; return false; }
     return true;
   }
   function sendTaller() {
@@ -476,9 +546,7 @@
     const f = res.tFecha;
     const lines = [waText('taller_titulo'), '', T.nombre,
       f ? `Fecha: ${fmtDate(f.fecha)}, ${fmtHour(f.hora_inicio)} a ${fmtHour(f.hora_fin)}` : 'Fecha: la próxima que tengan',
-      `Personas: ${res.tPers}`,
-      `Total: ${money(res.tPers * T.precio)} (USD ${T.precio} por persona, incluye ${T.incluye})`,
-      `Nombre: ${nombre}`];
+      `Personas: ${res.tPers}`, `Total: ${money(res.tPers * T.precio)} (USD ${T.precio} por persona, incluye ${T.incluye})`, `Nombre: ${nombre}`];
     track('form_submit', { tipo: 'taller' });
     openWa(lines.join('\n'), 'taller');
   }
@@ -490,27 +558,68 @@
     if (!fe.value || !checkFecha()) { err.textContent = 'Elige una fecha de lunes a sábado.'; err.hidden = false; fe.focus(); return; }
     if (!nombre) { err.textContent = 'Escribe tu nombre.'; err.hidden = false; $('[data-gr-nombre]').focus(); return; }
     err.hidden = true;
-    const lines = [waText('grupo_titulo'), '',
-      `Personas: ${res.gPers}`,
-      `Fecha: ${fmtDate(fe.value)}`];
+    const lines = [waText('grupo_titulo'), '', `Personas: ${res.gPers}`, `Fecha: ${fmtDate(fe.value)}`];
     if (res.occ) lines.push(`Ocasión: ${res.occ}`);
     lines.push(`Total: ${money(res.gPers * Gp.precio_persona)} (${res.gPers} x USD ${Gp.precio_persona}, incluye ${Gp.incluye})`, `Nombre: ${nombre}`);
     track('form_submit', { tipo: 'grupo' });
     openWa(lines.join('\n'), 'grupo');
   }
 
-  /* ---------- 5, 6, 7, 9, 10, 11 ---------- */
-  function renderResto() {
-    const ul = $('[data-seasons]');
-    D.colecciones_anio.forEach(c => ul.append(h('li', { class: 'season', style: `--tone:${c.tono}` }, h('span', { class: 'season__dot' }), h('b', {}, c.nombre), h('small', {}, c.nota))));
+  /* ---------- Resto de secciones ---------- */
+  function renderBase() {
+    const c = D.marca.colores;
+    const r = document.documentElement.style;
+    r.setProperty('--wine', c.vino); r.setProperty('--rose', c.rosa); r.setProperty('--cream', c.crema);
+    r.setProperty('--sage', c.salvia); r.setProperty('--lilac', c.lila); r.setProperty('--ink', c.tinta);
+    r.setProperty('--xred', c.navidad_rojo); r.setProperty('--gold', c.navidad_dorado);
+    if (!D.demo.banner) $('[data-demo-bar]').remove(); else $('[data-demo-text]').textContent = D.demo.texto;
+    $('[data-demo-text-foot]').textContent = D.demo.texto;
+    $('[data-hero-line]').textContent = D.hero.linea;
+    $('[data-hero-lead]').textContent = D.hero.bajada;
+    $$('[data-precios-etiqueta]').forEach(e => { e.textContent = D.precios_etiqueta; });
+    /* Titular letra por letra (la Í con su acento) */
+    const t = $('[data-hero-title]');
+    t.innerHTML = [...'VELATÍ'].map(ch => `<span class="ch" aria-hidden="true">${ch}</span>`).join('');
 
+    const L = D.local;
+    const addr = `${L.centro}, local ${L.local}, ${L.ciudad}`;
+    $('[data-local-addr]').textContent = addr;
+    $('[data-foot-addr]').textContent = addr;
+    $('[data-local-desc]').textContent = L.descripcion;
+    $('[data-local-hours]').textContent = L.horario ? 'Horario: ' + L.horario : 'Horario: escríbenos y te contamos.';
+    $('[data-maps]').href = L.maps;
+
+    const fl = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})">${[0, 72, 144, 216, 288].map(a => `<ellipse transform="rotate(${a})" cx="0" cy="-7" rx="5" ry="8" fill="${col}"/>`).join('')}<circle r="3.5" fill="#f2d48a"/></g>`;
+    const leaf = (x, y, a) => `<ellipse transform="translate(${x} ${y}) rotate(${a})" rx="4" ry="10" fill="#8fa086"/>`;
+    $('[data-oval-flowers]').innerHTML =
+      `<ellipse cx="150" cy="190" rx="132" ry="176" fill="none" stroke="#6b1e33" stroke-width="1.5" opacity=".55"/>` +
+      `<ellipse cx="150" cy="190" rx="122" ry="166" fill="none" stroke="#6b1e33" stroke-width=".8" opacity=".35"/>` +
+      leaf(40, 72, -30) + leaf(56, 52, 20) + leaf(250, 312, 30) + leaf(236, 334, -20) + leaf(262, 70, 40) + leaf(36, 310, -40) +
+      fl(46, 56, 1.4, '#e4a5ae') + fl(70, 40, 1, '#b7a3c8') + fl(28, 92, .9, '#f4dfdc') +
+      fl(254, 324, 1.4, '#e4a5ae') + fl(228, 344, 1, '#b7a3c8') + fl(272, 290, .9, '#f4dfdc') +
+      fl(262, 54, .8, '#b7a3c8') + fl(40, 330, .8, '#e4a5ae');
+
+    const mq = $('[data-marq]');
+    const items = D.marquee.map(x => `<span>${x}</span><i>✦</i>`).join('');
+    mq.innerHTML = items + items;
+
+    const dest = $('[data-destacados]');
+    D.destacados.map(prod).filter(sellable).forEach(p => dest.append(miniCard(p)));
+
+    $('[data-firma-txt]').textContent = D.firma.texto;
+    if (D.firma.enlace) {
+      const ig = $('[data-ignis]');
+      const a = h('a', { class: ig.className, href: D.firma.enlace, target: '_blank', rel: 'noopener', html: ig.innerHTML });
+      ig.replaceWith(a);
+    }
+  }
+  function renderResto() {
     const T = taller();
     T.aprendes.forEach(a => $('[data-aprendes]').append(h('li', {}, a)));
-    [`Materiales incluidos`, `USD ${T.precio} por persona`, `Duración: ${T.duracion}`, `En el ${T.lugar}`, T.cupos_texto].forEach(a => $('[data-incluye]').append(h('li', {}, a)));
+    ['Materiales incluidos', `USD ${T.precio} por persona`, `Duración: ${T.duracion}`, `En el ${T.lugar}`, T.cupos_texto].forEach(a => $('[data-incluye]').append(h('li', {}, a)));
 
     if (D.corporativo && D.corporativo.mostrar) {
-      const sec = $('[data-corp]');
-      sec.hidden = false;
+      $('[data-corp]').hidden = false;
       $('[data-corp-form]').addEventListener('submit', e => {
         e.preventDefault();
         const v = s => $(s).value.trim();
@@ -518,31 +627,20 @@
         track('form_submit', { tipo: 'corporativo' });
         openWa(lines.join('\n'), 'corporativo');
       });
-    } else {
-      $('[data-corp]').remove();
-    }
+    } else $('[data-corp]').remove();
 
     const gal = $('[data-galeria]');
-    if (D.galeria.length) {
-      D.galeria.forEach(g => gal.append(h('img', { src: g.src, alt: g.alt || '', loading: 'lazy', width: 600, height: 600 })));
-    } else {
-      gal.append(h('div', { class: 'gal__ph' }, h('span', {}, '📸'), h('p', {}, D.galeria_placeholder)));
-    }
+    if (D.galeria.length) D.galeria.forEach(g => gal.append(h('img', { class: 'ph', src: g.src, alt: g.alt || '', loading: 'lazy', width: 600, height: 600, onload: e => e.target.classList.add('is-in') })));
+    else gal.append(h('div', { class: 'gal__ph' }, h('span', { class: 'gal__icon', html: '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#i-flame"/></svg>' }), h('p', {}, D.galeria_placeholder)));
 
     const faq = $('[data-faq]');
-    D.faq.filter(f => f.respuesta).forEach((f, i) => {
-      const d = h('details', { class: 'qa' }, h('summary', {}, f.pregunta), h('p', {}, f.respuesta));
-      faq.append(d);
-    });
+    D.faq.filter(f => f.respuesta).forEach(f => faq.append(h('details', { class: 'qa' }, h('summary', {}, f.pregunta), h('p', {}, f.respuesta))));
 
     const pf = $('[data-pform]');
     $('[data-p-fecha]').min = todayISO();
     pf.addEventListener('submit', e => {
       e.preventDefault();
-      const n = $('[data-p-nombre]').value.trim();
-      const q = $('[data-p-que]').value.trim();
-      const fch = $('[data-p-fecha]').value;
-      const det = $('[data-p-det]').value.trim();
+      const n = $('[data-p-nombre]').value.trim(), q = $('[data-p-que]').value.trim(), fch = $('[data-p-fecha]').value, det = $('[data-p-det]').value.trim();
       if (!n || !q) { $('[data-p-err]').hidden = false; return; }
       $('[data-p-err]').hidden = true;
       const lines = [waText('pedido_titulo'), '', 'Nombre: ' + n, 'Quiero: ' + q];
@@ -553,59 +651,162 @@
     });
   }
 
-  /* ---------- Movimiento ---------- */
-  function petals() {
-    const box = $('[data-petals]');
-    if (reduced) return;
-    const cols = ['#e4a5ae', '#f4dfdc', '#b7a3c8'];
-    for (let i = 0; i < 9; i++) {
-      box.append(h('i', { class: 'petal', style: `left:${5 + i * 11}%;--d:${9 + (i % 4) * 2.5}s;--delay:${-i * 1.7}s;--c:${cols[i % 3]};--s:${.6 + (i % 3) * .25}` }));
-    }
-  }
-  function motion() {
-    const hero = $('.hero');
-    /* Pausa llama y pétalos fuera de pantalla */
+  /* ---------- Navegación: sección activa, progreso, cabecera ---------- */
+  function initNav() {
+    const top = $('[data-top]');
+    const bar = $('[data-progress]');
+    const onScroll = () => {
+      top.classList.toggle('is-scrolled', scrollY > 10);
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(([en]) => hero.classList.toggle('is-off', !en.isIntersecting)).observe(hero);
+      const io = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) $$('[data-nav]').forEach(a => a.classList.toggle('is-active', a.dataset.nav === e.target.id));
+      }), { rootMargin: '-45% 0px -50% 0px' });
+      $$('[data-sec]').forEach(s => io.observe(s));
     }
+    /* El dock se esconde mientras escribes */
+    const dock = $('[data-dock]');
+    document.addEventListener('focusin', e => { if (e.target.matches('input, textarea')) dock.classList.add('is-hidden'); });
+    document.addEventListener('focusout', () => dock.classList.remove('is-hidden'));
+  }
+
+  /* ---------- Detalles premium: cursor llama y botones magnéticos ---------- */
+  function premium() {
+    if (reduced || !finePtr.matches || !window.gsap) return;
+    const c = $('[data-cursor]');
+    document.documentElement.classList.add('has-cursor');
+    const xTo = gsap.quickTo(c, 'x', { duration: .25, ease: 'power3' });
+    const yTo = gsap.quickTo(c, 'y', { duration: .25, ease: 'power3' });
+    addEventListener('pointermove', e => { xTo(e.clientX); yTo(e.clientY); c.classList.add('is-on'); }, { passive: true });
+    document.addEventListener('pointerover', e => c.classList.toggle('is-hot', !!e.target.closest('a, button, label, select, summary')));
+    document.addEventListener('pointerleave', () => c.classList.remove('is-on'));
+    $$('.magnetic').forEach(b => {
+      b.addEventListener('pointermove', e => {
+        const r = b.getBoundingClientRect();
+        gsap.to(b, { x: (e.clientX - r.left - r.width / 2) * .25, y: (e.clientY - r.top - r.height / 2) * .35, duration: .3 });
+      });
+      b.addEventListener('pointerleave', () => gsap.to(b, { x: 0, y: 0, duration: .5, ease: 'elastic.out(1, .4)' }));
+    });
+  }
+
+  /* ---------- Chispas doradas (canvas, solo visible en el catálogo) ---------- */
+  function sparks() {
+    if (reduced) return;
+    const cv = $('[data-sparks]');
+    const ctx = cv.getContext('2d');
+    let W = 0, H = 0, on = false, raf = 0;
+    const N = wideMQ.matches ? 46 : 22;
+    const ps = [];
+    const size = () => { const dpr = Math.min(2, devicePixelRatio || 1); W = cv.offsetWidth; H = cv.offsetHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+    const spawn = (p, init) => Object.assign(p, { x: Math.random() * W, y: init ? Math.random() * H : H + 10, r: .6 + Math.random() * 1.6, v: .15 + Math.random() * .45, a: Math.random() * Math.PI * 2, f: .4 + Math.random() * .6 });
+    size();
+    for (let i = 0; i < N; i++) ps.push(spawn({}, true));
+    const tick = () => {
+      ctx.clearRect(0, 0, W, H);
+      for (const p of ps) {
+        p.y -= p.v; p.a += .02; p.x += Math.sin(p.a) * .3;
+        if (p.y < -10) spawn(p);
+        const tw = .45 + .55 * Math.abs(Math.sin(p.a * 1.7));
+        ctx.globalAlpha = tw * p.f;
+        ctx.fillStyle = '#f1d9a6';
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+      }
+      if (on) raf = requestAnimationFrame(tick);
+    };
+    new IntersectionObserver(([e]) => { on = e.isIntersecting; cancelAnimationFrame(raf); if (on) tick(); }).observe(cv);
+    addEventListener('resize', () => { size(); });
+  }
+
+  /* ---------- Pétalos del hero ---------- */
+  function petals() {
+    if (reduced) return;
+    const box = $('[data-petals]');
+    const cols = ['#e4a5ae', '#f4dfdc', '#b7a3c8'];
+    for (let i = 0; i < 9; i++) box.append(h('i', { class: 'petal', style: `left:${5 + i * 11}%;--d:${10 + (i % 4) * 2.5}s;--delay:${-i * 1.7}s;--c:${cols[i % 3]};--s:${.6 + (i % 3) * .25}` }));
+  }
+
+  /* ---------- Movimiento de autor ---------- */
+  function motion() {
+    const hero = $('[data-hero]');
+    if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => hero.classList.toggle('is-off', !en.isIntersecting)).observe(hero);
     const g = G();
     if (!g) { document.documentElement.classList.add('no-motion'); return; }
     const ST = window.ScrollTrigger;
     if (ST) g.registerPlugin(ST);
 
-    /* La vela se enciende al entrar */
-    const tl = g.timeline({ delay: .2 });
-    tl.from('.hero__script', { y: 20, opacity: 0, duration: .7, ease: 'power2.out' })
-      .from('.hero__title', { y: 30, opacity: 0, letterSpacing: '.4em', duration: 1, ease: 'power3.out' }, '<.1')
+    /* Entrada: el titular letra por letra y la vela se enciende */
+    g.timeline({ delay: .15 })
+      .from('[data-hero-script]', { y: 20, opacity: 0, duration: .7, ease: 'power2.out' })
+      .from('.hero__title .ch', { yPercent: 110, opacity: 0, rotate: 8, duration: .9, stagger: .06, ease: 'power3.out' }, '<.1')
       .from('.hero__line, .hero__lead, .hero__cta', { y: 18, opacity: 0, duration: .6, stagger: .1 }, '-=.5')
-      .from('.oval', { scale: .9, opacity: 0, duration: .9, ease: 'power2.out' }, .3)
-      .from('[data-flame]', { scaleY: 0, scaleX: .3, opacity: 0, transformOrigin: '50% 100%', duration: .7, ease: 'back.out(2.5)' }, '-=.2')
-      .from('[data-glow]', { opacity: 0, scale: .4, duration: 1.2, ease: 'power2.out' }, '<');
+      .from('.oval', { scale: .9, opacity: 0, duration: .9, ease: 'power2.out' }, .25)
+      .from('[data-flame]', { scaleY: 0, scaleX: .3, opacity: 0, transformOrigin: '50% 100%', duration: .7, ease: 'back.out(2.5)' }, '-=.15')
+      .from('[data-glow]', { opacity: 0, scale: .4, duration: 1.2, ease: 'power2.out' }, '<')
+      .from('[data-hint]', { opacity: 0, duration: .6 }, '-=.4');
 
-    if (ST) {
-      /* La luz crece con el scroll */
-      g.to('[data-glow]', { scale: 1.45, opacity: 1, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
-      g.to('.hero__candle', { y: 60, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
-      $$('[data-reveal]').forEach(el => g.from(el, { y: 28, opacity: 0, duration: .8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }));
-      g.from('.pick', { y: 20, opacity: 0, duration: .5, stagger: .03, ease: 'power2.out', scrollTrigger: { trigger: '[data-picker]', start: 'top 85%', once: true } });
-      g.from('.card', { y: 24, opacity: 0, duration: .5, stagger: .03, ease: 'power2.out', scrollTrigger: { trigger: '[data-grid]', start: 'top 85%', once: true } });
-      addEventListener('load', () => ST.refresh(), { once: true });
-    }
+    if (!ST) return;
+    const mm = g.matchMedia();
+    /* Escritorio y tablet: escena fijada, la vela se derrite con el scroll */
+    mm.add('(min-width: 768px)', () => {
+      const tl = g.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: .6, pin: '[data-hero-stage]', anticipatePin: 1 } });
+      tl.to('[data-wax]', { scaleY: .62, transformOrigin: '50% 100%', ease: 'none' }, 0)
+        .to('[data-drip]', { height: 70, ease: 'none' }, 0)
+        .to('[data-drip2]', { height: 48, ease: 'none' }, .1)
+        .to('[data-puddle]', { scaleX: 1, opacity: 1, ease: 'none' }, .2)
+        .to('[data-candle] .flame, [data-candle] .wick', { y: 46, ease: 'none' }, 0)
+        .to('[data-glow]', { scale: 2.1, opacity: 1, ease: 'none' }, 0)
+        .to('[data-warm]', { opacity: 1, ease: 'none' }, 0)
+        .to('.hero__copy', { y: -40, opacity: .15, ease: 'none' }, .35)
+        .to('[data-hint]', { opacity: 0, duration: .1 }, 0);
+    });
+    /* Móvil: versión corta, sin pin */
+    mm.add('(max-width: 767px)', () => {
+      g.to('[data-glow]', { scale: 1.5, opacity: 1, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+      g.to('[data-wax]', { scaleY: .8, transformOrigin: '50% 100%', ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+      g.to('[data-candle] .flame, [data-candle] .wick', { y: 22, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: true } });
+    });
+
+    /* Transición rosa a vino al entrar al catálogo */
+    g.fromTo('.catalogo', { '--bg-mix': 0 }, { '--bg-mix': 1, ease: 'none', scrollTrigger: { trigger: '.catalogo', start: 'top 95%', end: 'top 25%', scrub: true } });
+
+    /* Marquee que acelera con la velocidad del scroll */
+    const mq = $('[data-marq]');
+    let x = 0, boost = 0;
+    const half = () => mq.scrollWidth / 2;
+    g.ticker.add(() => {
+      x -= .6 + boost; boost *= .92;
+      if (-x >= half()) x += half();
+      mq.style.transform = `translate3d(${x}px,0,0)`;
+    });
+    ST.create({ onUpdate: s => { boost = Math.min(14, Math.abs(s.getVelocity()) / 220); } });
+
+    /* Reveals */
+    $$('[data-reveal]').forEach(el => g.from(el, { y: 30, opacity: 0, duration: .8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }));
+    ST.batch('.card', { start: 'top 92%', once: true, onEnter: b => g.fromTo(b, { y: 34, opacity: 0, clipPath: 'inset(18% 0 0 0)' }, { y: 0, opacity: 1, clipPath: 'inset(0% 0 0 0)', duration: .7, stagger: .06, ease: 'power3.out', overwrite: true }) });
+    addEventListener('load', () => ST.refresh(), { once: true });
 
     /* Lenis solo en escritorio */
     if (wideMQ.matches && window.Lenis) {
       const lenis = new window.Lenis({ lerp: .1 });
-      if (ST) lenis.on('scroll', ST.update);
+      lenis.on('scroll', ST.update);
       g.ticker.add(t => lenis.raf(t * 1000));
       g.ticker.lagSmoothing(0);
+      window.__lenis = lenis;
       document.addEventListener('click', e => {
         const a = e.target.closest('a[href^="#"]');
-        if (!a || a.getAttribute('href').length < 2) return;
+        if (!a || a.getAttribute('href').length < 2 || a.getAttribute('href').startsWith('#p/')) return;
         const t = $(a.getAttribute('href'));
         if (!t) return;
         e.preventDefault();
-        lenis.scrollTo(t, { offset: -70 });
+        closeDrawer();
+        lenis.scrollTo(t, { offset: -64 });
       });
+      const obs = new MutationObserver(() => { document.documentElement.classList.contains('is-locked') ? lenis.stop() : lenis.start(); });
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     }
   }
 
@@ -620,27 +821,32 @@
       console.warn('data.json', err);
       return;
     }
+    /* Limpia del carrito productos que ya no existen */
+    Object.keys(cart.qty).forEach(id => { if (!sellable(prod(id))) delete cart.qty[id]; });
+    if (!D.presentaciones.some(x => x.id === cart.pres)) cart.pres = 'sin-caja';
     renderBase();
-    renderBuilder();
-    watchGiftbar();
+    renderCatalog();
+    initDrawer();
+    renderCart();
     renderReserva();
-    renderGrid();
     renderResto();
-    bindWa();
+    $$('[data-wa]').forEach(a => { a.href = waLink(waText(a.dataset.wa)); });
     initMedicion();
+    initNav();
     document.addEventListener('click', e => {
       const a = e.target.closest('[data-wa]');
       if (!a) return;
       a.href = waLink(waText(a.dataset.wa));
       window.__lastWa = a.href;
-      track('whatsapp_click', { origen: a.classList.contains('fab') ? 'flotante' : (a.closest('section') || {}).id || 'cabecera' });
+      track('whatsapp_click', { origen: 'flotante' });
     });
-    /* Header con sombra al hacer scroll */
-    const top = $('[data-top]');
-    addEventListener('scroll', () => top.classList.toggle('is-scrolled', scrollY > 10), { passive: true });
+    $$('[data-drawer] a[href^="#"]').forEach(a => a.addEventListener('click', closeDrawer));
     petals();
+    sparks();
+    premium();
     motion();
-    window.__velati = { gift, res, giftMessage, D };
+    initSheet();
+    window.__velati = { cart, totals, giftMessage, res, D };
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
