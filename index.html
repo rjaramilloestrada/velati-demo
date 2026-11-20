@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow, noarchive">
-<title>Velati · Velitas y workshop · Demo</title>
+<title>Velati | Velas y workshop · Demo</title>
 <meta name="description" content="Demo de diseño preparado por IGNIS para Velati. Catálogo, arma tu regalo y reserva tu taller por WhatsApp. No es el sitio oficial.">
 <meta name="theme-color" content="#6b1e33">
 <meta property="og:title" content="Velati · Velitas hechas a mano y talleres">
@@ -21,6 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Pinyon+Script&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@800&family=Manrope:wght@600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add('js-pending');</script>
 </head>
 <body>
 <a class="skip" href="#catalogo">Saltar al catálogo</a>
@@ -36,11 +37,16 @@
       <a href="#reserva" data-nav="reserva">Talleres</a>
       <a href="#local" data-nav="local">El local</a>
     </nav>
-    <button class="cartbtn magnetic" type="button" data-open-cart aria-label="Abrir tu pedido">
+    <div class="top__act">
+    <a class="wabtn magnetic" data-wa="general" href="#" target="_blank" rel="noopener" aria-label="Escribir a Velati por WhatsApp">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span class="wabtn__txt">WhatsApp</span>
+    </a>
+    <button class="cartbtn magnetic" type="button" data-open-cart aria-label="Abrir tu pedido, vacío">
       <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-bag"/></svg>
       <span class="cartbtn__txt">Tu pedido</span>
       <b class="cartbtn__n" data-cart-n>0</b>
     </button>
+    </div>
   </div>
   <div class="progress" aria-hidden="true"><i data-progress></i></div>
 </header>
@@ -85,6 +91,9 @@
   <!-- Marquee de colecciones -->
   <div class="marq" aria-hidden="true"><div class="marq__track" data-marq></div></div>
 
+  <!-- Franja de confianza -->
+  <ul class="trust" data-trust aria-label="Por qué Velati"></ul>
+
   <!-- 2. Catálogo -->
   <section class="catalogo" id="catalogo" aria-labelledby="cat-t" data-sec>
     <canvas class="sparks" data-sparks aria-hidden="true"></canvas>
@@ -111,9 +120,21 @@
       </div>
     </div>
     <div class="wrap">
+      <div class="shortcuts" data-shortcuts></div>
       <p class="count" data-count aria-live="polite"></p>
       <ul class="grid" data-grid></ul>
       <p class="grid__note" data-grid-note></p>
+    </div>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section class="como" id="como" aria-labelledby="como-t">
+    <div class="wrap">
+      <header class="sec-head sec-head--center" data-reveal>
+        <p class="script">así de fácil</p>
+        <h2 id="como-t" class="h2">Cómo funciona</h2>
+      </header>
+      <ol class="steps" data-pasos></ol>
     </div>
   </section>
 
@@ -122,13 +143,8 @@
     <div class="wrap regalo__in">
       <div class="regalo__copy" data-reveal>
         <p class="script">para alguien especial</p>
-        <h2 id="regalo-t" class="h2">Arma tu regalo en 3 pasos</h2>
-        <ol class="regalo__steps">
-          <li><b>1</b><span>Elige tus velas</span></li>
-          <li><b>2</b><span>Súmale una caja</span></li>
-          <li><b>3</b><span>Escribe la tarjeta</span></li>
-        </ol>
-        <p class="lead">Te dejamos el pedido listo en WhatsApp, con el total calculado.</p>
+        <h2 id="regalo-t" class="h2">Arma tu regalo</h2>
+        <p class="lead">Elige tus velas, súmale una caja y escribe la tarjeta. Te dejamos el pedido listo en WhatsApp, con el total calculado.</p>
         <button class="btn btn--wine magnetic" type="button" data-open-gift>Empezar mi regalo</button>
       </div>
       <div class="regalo__picks" data-reveal>
@@ -175,7 +191,7 @@
             <button class="btn btn--wa btn--block" type="button" data-send-taller>
               <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span data-t-btn>Reservar por WhatsApp</span>
             </button>
-            <p class="err" data-t-err role="alert" hidden></p>
+            <p class="err" id="t-err" data-t-err role="alert" hidden></p>
           </div>
         </div>
       </div>
@@ -197,7 +213,7 @@
             <div class="field">
               <label for="gr-fecha">Fecha (lunes a sábado)</label>
               <input id="gr-fecha" type="date" data-gr-fecha>
-              <p class="err" data-gr-fecha-err role="alert" hidden></p>
+              <p class="err" id="gr-fecha-err" data-gr-fecha-err role="alert" hidden></p>
             </div>
             <div class="field">
               <span class="lbl">Ocasión</span>
@@ -211,7 +227,7 @@
             <button class="btn btn--wa btn--block" type="button" data-send-grupo>
               <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Separar fecha por WhatsApp</span>
             </button>
-            <p class="err" data-gr-err role="alert" hidden></p>
+            <p class="err" id="gr-err" data-gr-err role="alert" hidden></p>
           </div>
         </div>
       </div>
@@ -265,6 +281,14 @@
     </div>
   </section>
 
+  <!-- Testimonios (bloque reservado) -->
+  <section class="testi" id="testimonios" aria-labelledby="testi-t">
+    <div class="wrap">
+      <header class="sec-head sec-head--center" data-reveal><p class="script">lo que dicen</p><h2 id="testi-t" class="h2">Testimonios</h2></header>
+      <div class="testi__box" data-testimonios></div>
+    </div>
+  </section>
+
   <!-- 8. FAQ -->
   <section class="faq" id="faq" aria-labelledby="faq-t">
     <div class="wrap faq__in">
@@ -286,8 +310,13 @@
         <div class="field"><label for="p-que">¿Qué quieres?</label><input id="p-que" type="text" maxlength="100" placeholder="Ej: un bouquet rosa" required data-p-que></div>
         <div class="field"><label for="p-fecha">¿Para cuándo?</label><input id="p-fecha" type="date" data-p-fecha></div>
         <div class="field"><label for="p-det">Detalle</label><textarea id="p-det" rows="3" maxlength="400" placeholder="Colores, ocasión, lo que se te ocurra" data-p-det></textarea></div>
+        <figure class="chat chat--light" aria-hidden="true">
+          <figcaption class="chat__cap">Así llega tu pedido, ya armado</figcaption>
+          <div class="phone"><div class="phone__bar"><span class="phone__av">V</span><span class="phone__who"><b>Velati</b><small data-chat-num></small></span></div>
+            <div class="phone__body"><div class="bubble" data-bubble-p></div></div></div>
+        </figure>
         <button class="btn btn--wa btn--block magnetic" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Enviar por WhatsApp</span></button>
-        <p class="err" data-p-err role="alert" hidden>Escribe tu nombre y qué quieres.</p>
+        <p class="err" id="p-err" data-p-err role="alert" hidden>Escribe tu nombre y qué quieres.</p>
       </form>
     </div>
   </section>
@@ -314,10 +343,11 @@
 
 <!-- Dock móvil -->
 <nav class="dock" data-dock aria-label="Navegación">
+  <i class="dock__ind" data-dock-ind aria-hidden="true"></i>
   <a class="dock__it" href="#catalogo" data-nav="catalogo"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-grid"/></svg><span>Catálogo</span></a>
-  <button class="dock__it" type="button" data-open-gift><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-gift"/></svg><span>Regalo</span></button>
+  <button class="dock__it" type="button" data-open-gift data-nav="regalo"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-gift"/></svg><span>Regalo</span></button>
   <a class="dock__it" href="#reserva" data-nav="reserva"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-flame"/></svg><span>Talleres</span></a>
-  <button class="dock__it" type="button" data-open-cart><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-bag"/></svg><span>Pedido</span><b class="dock__n" data-cart-n>0</b></button>
+  <button class="dock__it" type="button" data-open-cart aria-label="Abrir tu pedido, vacío"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-bag"/></svg><span>Pedido</span><b class="dock__n" data-cart-n>0</b></button>
   <a class="dock__wa" data-wa="flotante" href="#" target="_blank" rel="noopener" aria-label="Escribir a Velati por WhatsApp"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg></a>
 </nav>
 
@@ -347,6 +377,8 @@
         <button class="btn btn--wine btn--grow" type="button" data-sheet-add>Agregar · <span data-sheet-sum></span></button>
       </div>
       <p class="sheet__soon" data-sheet-soon hidden>Próximamente. Escríbenos para apartarla.</p>
+      <button class="btn btn--wa btn--block" type="button" data-sheet-wa><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Pedir este por WhatsApp</span></button>
+      <details class="care" data-care><summary data-care-t></summary><ul data-care-list></ul></details>
       <a class="sheet__share" data-sheet-share href="#" target="_blank" rel="noopener"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg>Compartir este producto</a>
       <p class="sheet__note" data-sheet-note></p>
     </div>
@@ -393,6 +425,11 @@
         <div class="field"><label for="g-msg">Mensaje <small data-g-count></small></label><textarea id="g-msg" rows="3" placeholder="Ej: Feliz Navidad, gracias por todo 💗" data-g-msg></textarea></div>
         <div class="field"><label for="g-de">¿De parte de quién?</label><input id="g-de" type="text" maxlength="60" placeholder="Tu nombre" autocomplete="name" data-g-de></div>
       </section>
+      <details class="dsec dprev" data-dprev>
+        <summary>Así llega tu pedido, ya armado</summary>
+        <div class="phone" aria-hidden="true"><div class="phone__bar"><span class="phone__av">V</span><span class="phone__who"><b>Velati</b><small data-chat-num></small></span></div>
+          <div class="phone__body"><div class="bubble" data-bubble-g></div></div></div>
+      </details>
     </div>
     <footer class="drawer__foot">
       <div class="total"><span>Total referencial</span><b data-total>$0</b></div>
@@ -415,6 +452,7 @@
   <symbol id="i-bag" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M5 8h14l-1 13H6zM9 8V6a3 3 0 0 1 6 0v2"/></symbol>
   <symbol id="i-gift" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 11h16v10H4zM3 7h18v4H3zM12 7v14M12 7c-2-4-6-3-4 0M12 7c2-4 6-3 4 0"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-flame" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 3c3 4 6 6.5 6 10.5a6 6 0 0 1-12 0C6 10 8 8.5 9 6c1 2 2 2.5 3 3 0-2-1-4 0-6z"/></symbol>
 </svg>
 

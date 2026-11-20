@@ -35,7 +35,8 @@
     "grupo_titulo": "Hola Velati ✨ Quiero separar una fecha para mi grupo:",
     "corporativo_titulo": "Hola Velati 💗 Quiero cotizar regalos corporativos:",
     "pedido_titulo": "Hola Velati 💗 Quiero hacer un pedido:",
-    "pie": "Hola Velati 💗 Vi su página y quiero hacer una consulta."
+    "pie": "Hola Velati 💗 Vi su página y quiero hacer una consulta.",
+    "producto_titulo": "Hola Velati 💗 Me interesa este producto:"
   },
   "precios_etiqueta": "Precios referenciales de Navidad 2025, por actualizar a 2026",
   "categorias": [
@@ -456,7 +457,7 @@
         "Temperaturas",
         "Técnica de velas de molde"
       ],
-      "duracion": "3 a 3,5 horas aprox., según los flyers",
+      "duracion": "3 a 3,5 horas aprox.",
       "lugar": "CC Albán Borja",
       "cupos_texto": "Cupos limitados",
       "fechas": [
@@ -578,7 +579,7 @@
     "copos-pequenos"
   ],
   "firma": {
-    "texto": "Diseñado por",
+    "texto": "Demo por",
     "enlace": null
   },
   "marquee": [
@@ -588,5 +589,51 @@
     "Iced Latte Collection",
     "Bouquets by Velati",
     "Workshop de velas"
+  ],
+  "confianza": [
+    {
+      "icono": "flame",
+      "texto": "Hecho a mano en Guayaquil"
+    },
+    {
+      "icono": "pin",
+      "texto": "Taller en el CC Albán Borja"
+    },
+    {
+      "icono": "wa",
+      "texto": "Entregas: las coordinamos por WhatsApp"
+    }
+  ],
+  "pasos": [
+    {
+      "titulo": "Elige tus velas",
+      "texto": "Mira el catálogo y agrega lo que te guste con el botón +."
+    },
+    {
+      "titulo": "Arma la caja y la tarjeta",
+      "texto": "Si quieres, súmale una caja de regalo y escribe el mensaje de la tarjeta."
+    },
+    {
+      "titulo": "Te llega el pedido listo a WhatsApp",
+      "texto": "Te abrimos WhatsApp con el mensaje armado y confirmamos contigo los detalles."
+    }
+  ],
+  "cuidados_titulo": "Cuidados básicos (guía general)",
+  "cuidados": [
+    "No dejes una vela encendida sin supervisión.",
+    "Mantenla lejos de cortinas, niños y mascotas.",
+    "Úsala sobre una superficie firme y resistente al calor."
+  ],
+  "testimonios": [],
+  "testimonios_placeholder": "Aquí van opiniones reales de sus clientas, con su permiso. Por completar con Velati.",
+  "atajos_regalo": [
+    {
+      "texto": "Regalos hasta $10",
+      "budget": "b10"
+    },
+    {
+      "texto": "Regalos de $11 a $25",
+      "budget": "b25"
+    }
   ]
 }

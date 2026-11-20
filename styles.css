@@ -455,3 +455,90 @@ a.ignis:hover .ignis__word { color: #C84B1A; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .petal, .sparks, .hero__hint { display: none !important; }
 }
+
+/* ===== v3: estándar IGNIS ===== */
+/* Respaldo si GSAP no arranca: el contenido aparece igual a los 2,5 s */
+.js-pending .hero__copy, .js-pending .oval { opacity: 0; animation: jsfb 0s 2.5s forwards; }
+@keyframes jsfb { to { opacity: 1; } }
+
+/* Cabecera: WhatsApp + pedido */
+.top__act { display: flex; align-items: center; gap: 8px; }
+.wabtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 44px; min-height: 44px; padding: 0 12px; border-radius: 99px; background: var(--wa); color: #fff; text-decoration: none; font-weight: 600; }
+.wabtn svg { width: 20px; height: 20px; }
+.wabtn__txt { display: none; }
+
+/* Franja de confianza */
+.trust { list-style: none; margin: 0; padding: 14px 16px; display: flex; gap: 10px 22px; overflow-x: auto; scrollbar-width: none; background: var(--cream); border-bottom: 1px solid var(--line); }
+.trust::-webkit-scrollbar { display: none; }
+.trust li { flex: none; display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.trust svg { width: 18px; height: 18px; color: var(--wine); }
+
+/* Accesos de regalo por precio */
+.shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 6px; }
+.shortcut { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border-radius: 99px; border: 1px solid rgba(198, 160, 82, .55); background: rgba(198, 160, 82, .1); color: var(--gold-2); font-weight: 600; font-size: .9rem; cursor: pointer; transition: background .25s, color .25s; }
+.shortcut svg { width: 18px; height: 18px; display: block; }
+.shortcut[aria-pressed="true"] { background: var(--gold); color: #2a1a07; }
+
+/* Cómo funciona 01, 02, 03 */
+.como { background: var(--cream); padding-bottom: 20px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; counter-reset: s; }
+.step { position: relative; padding: 22px 20px 20px; border-radius: 20px; background: #fff; border: 1px solid var(--line); display: grid; gap: 6px; }
+.step__n { font-family: var(--serif); font-style: italic; font-size: 2.4rem; line-height: 1; color: var(--rose-2); }
+.step h3 { font-family: var(--serif); font-size: 1.25rem; color: var(--wine); }
+.step p { color: var(--muted); font-size: .95rem; }
+.regalo { padding-top: 40px; }
+
+/* Testimonios reservados */
+.testi { background: var(--cream); padding-bottom: 40px; }
+.testi__box { max-width: 680px; margin: 0 auto; }
+.testi__ph { display: grid; justify-items: center; gap: 4px; padding: 30px 22px; border-radius: 20px; border: 1.5px dashed var(--rose-2); background: #fff7f6; text-align: center; color: var(--muted); }
+.testi__q { font-family: var(--serif); font-size: 3.4rem; line-height: .8; color: var(--rose-2); }
+.quote { margin: 0 0 12px; padding: 22px; border-radius: 20px; background: #fff; border: 1px solid var(--line); }
+.quote blockquote { margin: 0; font-family: var(--serif); font-style: italic; font-size: 1.1rem; }
+.quote figcaption { margin-top: 8px; color: var(--muted); font-size: .9rem; }
+
+/* Vista previa del chat (patrón IGNIS) */
+.chat { margin: 6px 0 16px; }
+.chat__cap { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; color: var(--rose); margin-bottom: 8px; }
+.phone { border-radius: 18px; overflow: hidden; background: #efe6dc; border: 1px solid rgba(0, 0, 0, .06); }
+.phone__bar { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #075e54; color: #fff; }
+.phone__av { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--rose); color: var(--wine); font-family: var(--serif); font-weight: 600; }
+.phone__who { display: grid; line-height: 1.2; }
+.phone__who small { font-size: .72rem; opacity: .8; }
+.phone__body { padding: 14px 12px 16px; background: #e8ddd2 radial-gradient(rgba(107, 30, 51, .05) 1px, transparent 1px) 0 0 / 14px 14px; }
+.bubble { margin-left: auto; max-width: 92%; padding: 10px 12px; border-radius: 12px 12px 2px 12px; background: #dcf8c6; color: #1b1b1b; font-size: .86rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: 0 1px 1px rgba(0, 0, 0, .08); }
+.bubble.is-ph { color: #6b6b6b; font-style: italic; }
+.dprev { padding: 14px 0 6px; }
+.dprev summary { cursor: pointer; font-weight: 600; color: var(--wine); min-height: 44px; display: flex; align-items: center; gap: 8px; list-style: none; }
+.dprev summary::-webkit-details-marker { display: none; }
+.dprev summary::before { content: '+'; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--wine); font-size: 1rem; transition: transform .3s; }
+.dprev[open] summary::before { transform: rotate(45deg); }
+.dprev .phone { margin-top: 8px; }
+.dprev .phone__body { max-height: 280px; overflow-y: auto; }
+
+/* Ficha: pedir este y cuidados */
+[data-sheet-wa] { margin-top: 4px; }
+.care { margin-top: 4px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.care summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: .92rem; min-height: 44px; list-style: none; }
+.care summary::-webkit-details-marker { display: none; }
+.care ul { margin: 0; padding: 0 16px 14px 34px; color: var(--muted); font-size: .9rem; display: grid; gap: 4px; }
+.sheet { z-index: 85; }
+
+/* Foco visible en radios ocultos y chips */
+.date input:focus-visible + span, .presopt input:focus-visible + .presopt__in { outline: 2px solid var(--wine); outline-offset: 2px; }
+
+/* Dock: indicador deslizante */
+.dock__ind { position: absolute; left: 0; top: 6px; height: calc(100% - 12px); border-radius: 14px; background: rgba(255, 255, 255, .1); opacity: 0; transition: transform .4s var(--ease), width .3s, opacity .3s; pointer-events: none; }
+.dock__it.is-active { background: none; }
+
+@media (min-width: 640px) {
+  .steps { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 900px) {
+  .wabtn__txt { display: inline; }
+  .wabtn { padding: 0 16px; }
+  .trust { justify-content: center; }
+  .pform { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; max-width: 920px; align-items: start; }
+  .pform .chat { grid-column: 2; grid-row: 1 / span 4; margin-top: 0; }
+  .pform .btn, .pform .err, .pform .field { grid-column: 1; }
+}

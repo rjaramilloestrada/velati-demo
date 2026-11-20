@@ -78,6 +78,51 @@
   const fmtHour = t => t.replace(/^0/, '');
   const prod = id => D.productos.find(p => p.id === id);
   const catName = id => (D.categorias.find(c => c.id === id) || {}).nombre || '';
+  const fmtPhone = n => /^593\d{9}$/.test(n) ? `+593 ${n.slice(3, 5)} ${n.slice(5, 8)} ${n.slice(8)}` : '+' + n;
+  /* Errores de formulario legibles por lectores de pantalla */
+  function fieldErr(input, errEl, msg) {
+    if (msg) errEl.textContent = msg;
+    errEl.hidden = false;
+    input.setAttribute('aria-invalid', 'true');
+    input.setAttribute('aria-describedby', errEl.id);
+    input.focus();
+    const clr = () => { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); errEl.hidden = true; input.removeEventListener('input', clr); input.removeEventListener('change', clr); };
+    input.addEventListener('input', clr);
+    input.addEventListener('change', clr);
+  }
+  /* Paneles modales: foco atrapado, fondo inerte, Escape cierra el de arriba */
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
+  const modals = [];
+  function setInert(on) {
+    ['.demo-bar', '.top', 'main', '.foot', '.dock', '.fab'].forEach(sel => { const el = $(sel); if (el) el.inert = on; });
+  }
+  function pushModal(name, root, panel, onClose) {
+    const last = document.activeElement;
+    const onKey = e => {
+      if (e.key !== 'Tab') return;
+      const f = $$(FOCUSABLE, panel).filter(el => el.offsetParent !== null || el.getClientRects().length);
+      if (!f.length) { e.preventDefault(); return; }
+      const first = f[0], end = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) { e.preventDefault(); end.focus(); }
+      else if (!e.shiftKey && document.activeElement === end) { e.preventDefault(); first.focus(); }
+    };
+    panel.addEventListener('keydown', onKey);
+    modals.forEach(m => { m.root.inert = true; });
+    modals.push({ name, root, panel, onKey, last, onClose });
+    setInert(true);
+    document.documentElement.classList.add('is-locked');
+  }
+  function popModal(name) {
+    const i = modals.findIndex(m => m.name === name);
+    if (i < 0) return;
+    const [m] = modals.splice(i, 1);
+    m.panel.removeEventListener('keydown', m.onKey);
+    const top = modals[modals.length - 1];
+    if (top) top.root.inert = false;
+    else { setInert(false); document.documentElement.classList.remove('is-locked'); }
+    if (m.last && m.last.focus && document.contains(m.last)) m.last.focus({ preventScroll: true });
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modals.length) modals[modals.length - 1].onClose(); });
   const haptic = () => { try { navigator.vibrate && navigator.vibrate(10); } catch (e) { /* nada */ } };
   let toastT = 0;
   function toast(msg) {
@@ -194,6 +239,7 @@
   function renderCart(animate) {
     const t = totals();
     $$('[data-cart-n]').forEach(e => { e.textContent = t.n; e.classList.toggle('is-on', t.n > 0); });
+    $$('[data-open-cart]').forEach(b => b.setAttribute('aria-label', t.n ? `Abrir tu pedido, ${t.n} ${t.n === 1 ? 'producto' : 'productos'}` : 'Abrir tu pedido, vacío'));
     /* Paso 1: líneas */
     const ul = $('[data-clines]');
     ul.innerHTML = '';
@@ -223,7 +269,14 @@
     updateCard();
     if (animate) bump();
   }
+  function giftBubble() {
+    const b = $('[data-bubble-g]');
+    if (!b) return;
+    b.textContent = totals().lines.length ? giftMessage() : 'Elige al menos una vela y aquí verás tu mensaje armado.';
+    b.classList.toggle('is-ph', !totals().lines.length);
+  }
   function updateCard() {
+    giftBubble();
     $('[data-card-para]').textContent = 'Para ' + (cart.para.trim() || 'alguien especial');
     $('[data-card-msg]').textContent = cart.msg.trim() || 'Tu mensaje aparece aquí mientras escribes…';
     $('[data-card-msg]').classList.toggle('is-ph', !cart.msg.trim());
@@ -254,25 +307,23 @@
   }
 
   /* ---------- Drawer ---------- */
-  let lastFocus = null;
   function openDrawer(step) {
     const d = $('[data-drawer]');
-    lastFocus = document.activeElement;
+    if (!d.hidden && d.classList.contains('is-open')) return;
     d.hidden = false;
-    document.documentElement.classList.add('is-locked');
+    const panel = $('[data-drawer-panel]');
+    pushModal('drawer', d, panel, closeDrawer);
     requestAnimationFrame(() => d.classList.add('is-open'));
     renderCart();
-    const panel = $('[data-drawer-panel]');
     panel.focus({ preventScroll: true });
     if (step) { const sec = $(`[data-dsec="${step}"]`); if (sec) $('[data-drawer-body]').scrollTop = sec.offsetTop - 70; }
   }
   function closeDrawer() {
     const d = $('[data-drawer]');
-    if (d.hidden) return;
+    if (d.hidden || !d.classList.contains('is-open')) return;
     d.classList.remove('is-open');
-    document.documentElement.classList.remove('is-locked');
-    setTimeout(() => { d.hidden = true; }, reduced ? 0 : 380);
-    if (lastFocus) lastFocus.focus({ preventScroll: true });
+    popModal('drawer');
+    setTimeout(() => { if (!d.classList.contains('is-open')) d.hidden = true; }, reduced ? 0 : 380);
   }
   function initDrawer() {
     const pr = $('[data-pres]');
@@ -336,6 +387,11 @@
     const bud = $('[data-budget]');
     BUDGETS.forEach(b => bud.append(h('button', { type: 'button', class: 'bchip', 'aria-pressed': String(b.id === view.budget), 'data-b': b.id, onclick: () => { view.budget = b.id; applyView(true); } }, b.nombre)));
     $('[data-sort]').addEventListener('change', e => { view.sort = e.target.value; applyView(true); });
+    const sc = $('[data-shortcuts]');
+    (D.atajos_regalo || []).forEach(a => sc.append(h('button', { type: 'button', class: 'shortcut', 'data-preset': a.budget, onclick: () => {
+      view.budget = view.budget === a.budget ? 'all' : a.budget; view.cat = 'todos'; applyView(true);
+      $('[data-toolbar]').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    } }, h('span', { html: '<svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-gift"/></svg>' }), a.texto)));
 
     const ul = $('[data-grid]');
     all.forEach((p, i) => {
@@ -361,6 +417,7 @@
   function applyView(animate) {
     $$('[data-cat]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === view.cat)));
     $$('[data-b]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.b === view.budget)));
+    $$('[data-preset]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.preset === view.budget)));
     const okB = BUDGETS.find(b => b.id === view.budget).ok;
     const ul = $('[data-grid]');
     const cards = $$('[data-card]', ul);
@@ -405,10 +462,14 @@
     $('[data-sheet-share]').href = 'https://wa.me/?text=' + encodeURIComponent(`Mira esta vela de Velati 💗 ${p.nombre}: ${url}`);
     sheetQty();
     if (!fromHash && location.hash !== '#p/' + id) history.replaceState(null, '', '#p/' + id);
-    lastFocus = document.activeElement;
-    s.hidden = false;
-    document.documentElement.classList.add('is-locked');
-    requestAnimationFrame(() => s.classList.add('is-open'));
+    $('[data-care]').hidden = !(D.cuidados && D.cuidados.length);
+    $('[data-sheet-wa]').hidden = soon;
+    if (!s.classList.contains('is-open')) {
+      s.hidden = false;
+      pushModal('sheet', s, $('[data-sheet-panel]'), closeSheet);
+      requestAnimationFrame(() => s.classList.add('is-open'));
+    }
+    $('[data-sheet-panel]').scrollTop = 0;
     $('[data-sheet-panel]').focus({ preventScroll: true });
   }
   function sheetQty() {
@@ -419,12 +480,11 @@
   }
   function closeSheet() {
     const s = $('[data-sheet]');
-    if (s.hidden) return;
+    if (s.hidden || !s.classList.contains('is-open')) return;
     s.classList.remove('is-open');
-    document.documentElement.classList.remove('is-locked');
-    setTimeout(() => { s.hidden = true; }, reduced ? 0 : 360);
+    popModal('sheet');
+    setTimeout(() => { if (!s.classList.contains('is-open')) s.hidden = true; }, reduced ? 0 : 360);
     if (location.hash.startsWith('#p/')) history.replaceState(null, '', location.pathname + location.search);
-    if (lastFocus) lastFocus.focus({ preventScroll: true });
   }
   function initSheet() {
     $('[data-sq-minus]').addEventListener('click', () => { sheetState.q = Math.max(1, sheetState.q - 1); sheetQty(); });
@@ -435,7 +495,15 @@
       setTimeout(closeSheet, 250);
     });
     $$('[data-close-sheet]').forEach(b => b.addEventListener('click', closeSheet));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSheet(); closeDrawer(); } });
+    $('[data-care-t]').textContent = D.cuidados_titulo || 'Cuidados básicos';
+    (D.cuidados || []).forEach(c => $('[data-care-list]').append(h('li', {}, c)));
+    $('[data-sheet-wa]').addEventListener('click', () => {
+      const p = prod(sheetState.id);
+      const l = lineCalc(p, sheetState.q);
+      const msg = [waText('producto_titulo'), '', `• ${sheetState.q} x ${p.nombre}: ${money(l.total)}${l.oferta ? ` (oferta ${p.oferta.cantidad} x ${money(p.oferta.precio)})` : ''}`, '', `${D.precios_etiqueta} ✨`].join('\n');
+      track('form_submit', { tipo: 'producto', id: p.id });
+      openWa(msg, 'ficha');
+    });
     const fromHash = () => { const m = location.hash.match(/^#p\/([\w-]+)$/); if (m && prod(m[1])) openSheet(m[1], true); };
     addEventListener('hashchange', fromHash);
     fromHash();
@@ -480,10 +548,30 @@
     fe.addEventListener('change', checkFecha);
     fe.addEventListener('input', checkFecha);
     const occ = $('[data-gr-occ]');
+    const occSync = () => {
+      const bs = $$('.fchip', occ);
+      bs.forEach(b => b.setAttribute('aria-checked', String(b.textContent === res.occ)));
+      const cur = bs.find(b => b.textContent === res.occ) || bs[0];
+      bs.forEach(b => { b.tabIndex = b === cur ? 0 : -1; });
+    };
     Gp.ocasiones.forEach(o => occ.append(h('button', { type: 'button', class: 'fchip', role: 'radio', 'aria-checked': 'false', onclick: () => {
       res.occ = res.occ === o ? '' : o;
-      $$('.fchip', occ).forEach(b => b.setAttribute('aria-checked', String(b.textContent === res.occ)));
+      occSync();
     } }, o)));
+    occ.addEventListener('keydown', e => {
+      const bs = $$('.fchip', occ);
+      const i = bs.indexOf(document.activeElement);
+      if (i < 0) return;
+      let n = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = (i + 1) % bs.length;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = (i - 1 + bs.length) % bs.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = bs.length - 1;
+      if (n == null) return;
+      e.preventDefault();
+      res.occ = bs[n].textContent; occSync(); bs[n].focus();
+    });
+    occSync();
     $('[data-send-grupo]').addEventListener('click', sendGrupo);
     clampG();
 
@@ -533,15 +621,17 @@
     const err = $('[data-gr-fecha-err]');
     err.hidden = true;
     if (!fe.value) return true;
-    if (fe.value < fe.min) { err.textContent = 'Elige una fecha a partir de mañana.'; err.hidden = false; fe.value = ''; return false; }
-    if (new Date(fe.value + 'T12:00:00').getDay() === 0) { err.textContent = 'Los domingos no hay grupos. Elige de lunes a sábado.'; err.hidden = false; fe.value = ''; return false; }
+    const bad = msg => { err.textContent = msg; err.hidden = false; fe.value = ''; fe.setAttribute('aria-invalid', 'true'); fe.setAttribute('aria-describedby', err.id); return false; };
+    fe.removeAttribute('aria-invalid'); fe.removeAttribute('aria-describedby');
+    if (fe.value < fe.min) return bad('Elige una fecha a partir de mañana.');
+    if (new Date(fe.value + 'T12:00:00').getDay() === 0) return bad('Los domingos no hay grupos. Elige de lunes a sábado.');
     return true;
   }
   function sendTaller() {
     const T = taller();
     const nombre = $('[data-t-nombre]').value.trim();
     const err = $('[data-t-err]');
-    if (!nombre) { err.textContent = 'Escribe tu nombre.'; err.hidden = false; $('[data-t-nombre]').focus(); return; }
+    if (!nombre) return fieldErr($('[data-t-nombre]'), err, 'Escribe tu nombre.');
     err.hidden = true;
     const f = res.tFecha;
     const lines = [waText('taller_titulo'), '', T.nombre,
@@ -555,8 +645,8 @@
     const fe = $('[data-gr-fecha]');
     const nombre = $('[data-gr-nombre]').value.trim();
     const err = $('[data-gr-err]');
-    if (!fe.value || !checkFecha()) { err.textContent = 'Elige una fecha de lunes a sábado.'; err.hidden = false; fe.focus(); return; }
-    if (!nombre) { err.textContent = 'Escribe tu nombre.'; err.hidden = false; $('[data-gr-nombre]').focus(); return; }
+    if (!fe.value || !checkFecha()) return fieldErr(fe, err, 'Elige una fecha de lunes a sábado.');
+    if (!nombre) return fieldErr($('[data-gr-nombre]'), err, 'Escribe tu nombre.');
     err.hidden = true;
     const lines = [waText('grupo_titulo'), '', `Personas: ${res.gPers}`, `Fecha: ${fmtDate(fe.value)}`];
     if (res.occ) lines.push(`Ocasión: ${res.occ}`);
@@ -614,6 +704,16 @@
     }
   }
   function renderResto() {
+    const ICON = { flame: '#i-flame', pin: '#i-pin', wa: '#i-wa', check: '#i-check' };
+    const tr = $('[data-trust]');
+    (D.confianza || []).forEach(c => tr.append(h('li', { html: `<svg aria-hidden="true" viewBox="0 0 24 24"><use href="${ICON[c.icono] || '#i-check'}"/></svg><span></span>` })));
+    $$('li span', tr).forEach((sp, i) => { sp.textContent = D.confianza[i].texto; });
+    const st = $('[data-pasos]');
+    (D.pasos || []).forEach((p, i) => st.append(h('li', { class: 'step', 'data-reveal': '' }, h('span', { class: 'step__n' }, String(i + 1).padStart(2, '0')), h('h3', {}, p.titulo), h('p', {}, p.texto))));
+    const tb = $('[data-testimonios]');
+    if (D.testimonios && D.testimonios.length) D.testimonios.forEach(t => tb.append(h('figure', { class: 'quote' }, h('blockquote', {}, t.texto), h('figcaption', {}, t.autor))));
+    else tb.append(h('div', { class: 'testi__ph' }, h('span', { class: 'testi__q', 'aria-hidden': 'true' }, '“'), h('p', {}, D.testimonios_placeholder)));
+    $$('[data-chat-num]').forEach(e => { e.textContent = fmtPhone(D.whatsapp); });
     const T = taller();
     T.aprendes.forEach(a => $('[data-aprendes]').append(h('li', {}, a)));
     ['Materiales incluidos', `USD ${T.precio} por persona`, `Duración: ${T.duracion}`, `En el ${T.lugar}`, T.cupos_texto].forEach(a => $('[data-incluye]').append(h('li', {}, a)));
@@ -638,18 +738,38 @@
 
     const pf = $('[data-pform]');
     $('[data-p-fecha]').min = todayISO();
-    pf.addEventListener('submit', e => {
-      e.preventDefault();
+    const pedidoMsg = (ph) => {
       const n = $('[data-p-nombre]').value.trim(), q = $('[data-p-que]').value.trim(), fch = $('[data-p-fecha]').value, det = $('[data-p-det]').value.trim();
-      if (!n || !q) { $('[data-p-err]').hidden = false; return; }
-      $('[data-p-err]').hidden = true;
-      const lines = [waText('pedido_titulo'), '', 'Nombre: ' + n, 'Quiero: ' + q];
+      const lines = [waText('pedido_titulo'), '', 'Nombre: ' + (n || (ph ? 'tu nombre' : '')), 'Quiero: ' + (q || (ph ? 'lo que quieres' : ''))];
       if (fch) lines.push('Para: ' + fmtDate(fch));
       if (det) lines.push('Detalle: ' + det);
+      return lines.join('\n');
+    };
+    const bubble = $('[data-bubble-p]');
+    const upd = () => { bubble.textContent = pedidoMsg(true); };
+    pf.addEventListener('input', () => { upd(); const g = G(); if (g) g.fromTo(bubble, { scale: .98 }, { scale: 1, duration: .25, ease: 'back.out(3)' }); });
+    upd();
+    pf.addEventListener('submit', e => {
+      e.preventDefault();
+      const n = $('[data-p-nombre]'), q = $('[data-p-que]');
+      if (!n.value.trim()) return fieldErr(n, $('[data-p-err]'), 'Escribe tu nombre.');
+      if (!q.value.trim()) return fieldErr(q, $('[data-p-err]'), 'Cuéntanos qué quieres.');
       track('form_submit', { tipo: 'pedido' });
-      openWa(lines.join('\n'), 'pedido');
+      openWa(pedidoMsg(false), 'pedido');
     });
   }
+
+  /* Indicador deslizante del dock */
+  function moveDockInd() {
+    const ind = $('[data-dock-ind]');
+    const on = $('.dock .dock__it.is-active');
+    if (!ind) return;
+    if (!on) { ind.style.opacity = '0'; return; }
+    ind.style.opacity = '1';
+    ind.style.width = on.offsetWidth + 'px';
+    ind.style.transform = `translateX(${on.offsetLeft}px)`;
+  }
+  addEventListener('resize', () => moveDockInd());
 
   /* ---------- Navegación: sección activa, progreso, cabecera ---------- */
   function initNav() {
@@ -664,7 +784,7 @@
     onScroll();
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver(es => es.forEach(e => {
-        if (e.isIntersecting) $$('[data-nav]').forEach(a => a.classList.toggle('is-active', a.dataset.nav === e.target.id));
+        if (e.isIntersecting) { $$('[data-nav]').forEach(a => a.classList.toggle('is-active', a.dataset.nav === e.target.id)); moveDockInd(); }
       }), { rootMargin: '-45% 0px -50% 0px' });
       $$('[data-sec]').forEach(s => io.observe(s));
     }
@@ -733,6 +853,7 @@
   function motion() {
     const hero = $('[data-hero]');
     if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => hero.classList.toggle('is-off', !en.isIntersecting)).observe(hero);
+    document.documentElement.classList.remove('js-pending');
     const g = G();
     if (!g) { document.documentElement.classList.add('no-motion'); return; }
     const ST = window.ScrollTrigger;
@@ -819,6 +940,7 @@
     } catch (err) {
       $('main').prepend(h('p', { role: 'alert', style: 'padding:120px 16px 24px;font-weight:700' }, 'No se pudo cargar data.json. Abre la página desde un servidor (por ejemplo, python3 -m http.server).'));
       console.warn('data.json', err);
+      document.documentElement.classList.remove('js-pending');
       return;
     }
     /* Limpia del carrito productos que ya no existen */
@@ -838,7 +960,7 @@
       if (!a) return;
       a.href = waLink(waText(a.dataset.wa));
       window.__lastWa = a.href;
-      track('whatsapp_click', { origen: 'flotante' });
+      track('whatsapp_click', { origen: a.classList.contains('wabtn') ? 'cabecera' : 'flotante' });
     });
     $$('[data-drawer] a[href^="#"]').forEach(a => a.addEventListener('click', closeDrawer));
     petals();
