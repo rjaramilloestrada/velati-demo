@@ -349,7 +349,7 @@
     {
       "id": "tazas",
       "nombre": "Tazas navideñas",
-      "descripcion": "Taza 12, taza 15, taza 20",
+      "descripcion": "Próximamente: taza 12, taza 15, taza 20",
       "coleccion": "navidad",
       "categoria": "taza",
       "precio": null,
@@ -601,7 +601,7 @@
     },
     {
       "icono": "wa",
-      "texto": "Entregas: las coordinamos por WhatsApp"
+      "texto": "Pedidos y reservas por WhatsApp"
     }
   ],
   "pasos": [
