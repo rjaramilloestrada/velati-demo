@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es-EC">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Velati · Velitas y workshop · Demo</title>
+<meta name="description" content="Demo de diseño preparado por IGNIS para Velati. Colección de Navidad, arma tu regalo y reserva tu taller por WhatsApp. No es el sitio oficial.">
+<meta name="theme-color" content="#6b1e33">
+<meta property="og:title" content="Velati · Velitas hechas a mano y talleres">
+<meta property="og:description" content="Colección de Navidad, arma tu regalo y reserva tu taller o tu grupo por WhatsApp. Demo de diseño, no es el sitio oficial.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_EC">
+<meta property="og:image" content="https://rjaramilloestrada.github.io/velati-demo/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Pinyon+Script&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#regalo">Saltar al contenido</a>
+
+<div class="demo-bar" role="note" data-demo-bar><span data-demo-text>Demo de diseño preparado por IGNIS para Velati. No es el sitio oficial.</span></div>
+
+<header class="top" data-top>
+  <div class="top__in">
+    <a class="brand" href="#inicio" aria-label="Velati, inicio">VELAT<span class="brand__i">Í</span></a>
+    <nav class="topnav" aria-label="Secciones">
+      <a href="#navidad">Navidad</a>
+      <a href="#regalo">Arma tu regalo</a>
+      <a href="#reserva">Talleres</a>
+      <a href="#local">El local</a>
+    </nav>
+    <a class="btn btn--wine btn--sm" data-wa="general" href="#" target="_blank" rel="noopener">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Escríbenos</span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <!-- 1. Hero -->
+  <section class="hero" id="inicio" aria-labelledby="hero-t">
+    <div class="hero__petals" data-petals aria-hidden="true"></div>
+    <div class="hero__in">
+      <div class="hero__copy">
+        <p class="script hero__script">velitas &amp; workshop</p>
+        <h1 id="hero-t" class="hero__title">VELAT<span class="brand__i">Í</span></h1>
+        <p class="hero__line" data-hero-line></p>
+        <p class="hero__lead" data-hero-lead></p>
+        <div class="hero__cta">
+          <a class="btn btn--wine" href="#navidad">Ver colección Navidad</a>
+          <a class="btn btn--line" href="#reserva">Reservar taller</a>
+        </div>
+      </div>
+      <div class="hero__candle" data-candle aria-hidden="true">
+        <div class="glow" data-glow></div>
+        <div class="oval">
+          <svg class="oval__flowers" viewBox="0 0 300 380" data-oval-flowers></svg>
+          <div class="candle">
+            <div class="flame" data-flame><i class="flame__core"></i></div>
+            <div class="wick"></div>
+            <div class="wax"><i class="wax__drip"></i><i class="wax__drip wax__drip--b"></i></div>
+            <div class="dish"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="hero__note" data-img-note></p>
+  </section>
+
+  <!-- 2. Atajos -->
+  <nav class="chips-nav" aria-label="Atajos">
+    <div class="chips-nav__in">
+      <a class="chip" href="#navidad">🎄 Navidad</a>
+      <a class="chip" href="#regalo">🎁 Arma tu regalo</a>
+      <a class="chip" href="#reserva" data-tab-go="taller">🕯️ Talleres</a>
+      <a class="chip" href="#reserva" data-tab-go="grupo">👯 Grupos</a>
+      <a class="chip" href="#local">📍 Cómo llegar</a>
+    </div>
+  </nav>
+
+  <!-- 3a. Arma tu regalo -->
+  <section class="regalo" id="regalo" aria-labelledby="regalo-t">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="script">para alguien especial</p>
+        <h2 id="regalo-t" class="h2">Arma tu regalo</h2>
+        <p class="lead">Elige tus velas, súmale una caja si quieres y escribe la tarjeta. Te dejamos el pedido listo en WhatsApp.</p>
+        <p class="pill pill--xmas" data-precios-etiqueta></p>
+      </header>
+
+      <div class="builder" data-builder>
+        <div class="builder__steps">
+          <fieldset class="bstep" aria-labelledby="b1-t">
+            <legend id="b1-t" class="bstep__t"><span class="bstep__n">1</span> Elige tus velas</legend>
+            <div class="bfilter" data-bfilter role="group" aria-label="Filtrar por tipo"></div>
+            <ul class="picker" data-picker></ul>
+          </fieldset>
+
+          <fieldset class="bstep" aria-labelledby="b2-t">
+            <legend id="b2-t" class="bstep__t"><span class="bstep__n">2</span> ¿Le sumas una caja?</legend>
+            <div class="pres" data-pres></div>
+          </fieldset>
+
+          <fieldset class="bstep" aria-labelledby="b3-t">
+            <legend id="b3-t" class="bstep__t"><span class="bstep__n">3</span> La tarjeta</legend>
+            <div class="field">
+              <label for="g-para">¿Para quién es?</label>
+              <input id="g-para" type="text" maxlength="60" placeholder="Ej: mi mamá" autocomplete="off" data-g-para>
+            </div>
+            <div class="field">
+              <label for="g-msg">Mensaje de la tarjeta <small data-g-count></small></label>
+              <textarea id="g-msg" rows="3" placeholder="Ej: Feliz Navidad, gracias por todo 💗" data-g-msg></textarea>
+            </div>
+            <div class="field">
+              <label for="g-de">¿De parte de quién?</label>
+              <input id="g-de" type="text" maxlength="60" placeholder="Tu nombre" autocomplete="name" data-g-de>
+            </div>
+          </fieldset>
+        </div>
+
+        <aside class="summary" aria-labelledby="sum-t">
+          <div class="summary__stick">
+            <h3 id="sum-t" class="summary__t">Tu regalo</h3>
+            <div class="giftbox" data-giftbox aria-hidden="true">
+              <div class="giftbox__drop" data-drop></div>
+              <div class="giftbox__items" data-gb-items></div>
+              <div class="giftbox__box" data-gb-box><span class="giftbox__lid"></span><span class="giftbox__ribbon"></span></div>
+            </div>
+            <ul class="lines" data-lines aria-live="polite"></ul>
+            <p class="empty" data-empty>Todavía no eliges nada. Toca una vela para empezar.</p>
+            <div class="card-prev" data-cardprev>
+              <p class="card-prev__brand">VELAT<span class="brand__i">Í</span></p>
+              <p class="card-prev__head script" data-card-head></p>
+              <p class="card-prev__para" data-card-para></p>
+              <p class="card-prev__msg" data-card-msg></p>
+              <p class="card-prev__de" data-card-de></p>
+            </div>
+            <div class="total">
+              <span>Total referencial</span>
+              <b data-total>$0</b>
+            </div>
+            <p class="total__note" data-total-note></p>
+            <button class="btn btn--wa btn--block" type="button" data-send-gift>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Enviar mi regalo por WhatsApp</span>
+            </button>
+            <p class="err" data-gift-err role="alert" hidden>Elige al menos una vela.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3b. Reserva -->
+  <section class="reserva" id="reserva" aria-labelledby="reserva-t">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="script">ven a crear</p>
+        <h2 id="reserva-t" class="h2">Reserva tu taller o tu grupo</h2>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Tipo de reserva">
+        <button class="tab" role="tab" id="tab-taller" aria-controls="panel-taller" aria-selected="true" data-tab="taller">Taller abierto</button>
+        <button class="tab" role="tab" id="tab-grupo" aria-controls="panel-grupo" aria-selected="false" data-tab="grupo" tabindex="-1">Tu grupo privado</button>
+        <i class="tabs__ind" data-tabs-ind aria-hidden="true"></i>
+      </div>
+
+      <div class="panel" role="tabpanel" id="panel-taller" aria-labelledby="tab-taller" data-panel="taller">
+        <div class="frame">
+          <div class="frame__in">
+            <p class="frame__kicker" data-t-kicker></p>
+            <h3 class="frame__t" data-t-name></h3>
+            <p class="frame__meta" data-t-meta></p>
+            <div class="dates" data-t-dates></div>
+            <div class="field field--row">
+              <label for="t-nombre">Tu nombre</label>
+              <input id="t-nombre" type="text" maxlength="60" autocomplete="name" placeholder="Nombre" data-t-nombre>
+            </div>
+            <div class="field field--row">
+              <span class="lbl" id="t-pers-l">Personas</span>
+              <div class="stepper" role="group" aria-labelledby="t-pers-l">
+                <button type="button" aria-label="Menos" data-t-minus>−</button>
+                <output data-t-pers aria-live="polite">1</output>
+                <button type="button" aria-label="Más" data-t-plus>+</button>
+              </div>
+            </div>
+            <div class="total total--frame"><span>Total</span><b data-t-total></b></div>
+            <button class="btn btn--wa btn--block" type="button" data-send-taller>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span data-t-btn>Reservar por WhatsApp</span>
+            </button>
+            <p class="err" data-t-err role="alert" hidden></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" role="tabpanel" id="panel-grupo" aria-labelledby="tab-grupo" data-panel="grupo" hidden>
+        <div class="frame">
+          <div class="frame__in">
+            <p class="frame__kicker">Reserva para tu grupo</p>
+            <h3 class="frame__t">Una tarde de velas, solo para ustedes</h3>
+            <p class="frame__meta" data-g-meta></p>
+            <div class="field field--row">
+              <span class="lbl" id="g-pers-l">Personas</span>
+              <div class="stepper" role="group" aria-labelledby="g-pers-l">
+                <button type="button" aria-label="Menos" data-gr-minus>−</button>
+                <output data-gr-pers aria-live="polite">6</output>
+                <button type="button" aria-label="Más" data-gr-plus>+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="gr-fecha">Fecha (lunes a sábado)</label>
+              <input id="gr-fecha" type="date" data-gr-fecha>
+              <p class="err" data-gr-fecha-err role="alert" hidden></p>
+            </div>
+            <div class="field">
+              <span class="lbl">Ocasión</span>
+              <div class="occ" data-gr-occ role="radiogroup" aria-label="Ocasión"></div>
+            </div>
+            <div class="field">
+              <label for="gr-nombre">Tu nombre</label>
+              <input id="gr-nombre" type="text" maxlength="60" autocomplete="name" placeholder="Nombre" data-gr-nombre>
+            </div>
+            <div class="total total--frame"><span><span data-gr-calc></span></span><b data-gr-total></b></div>
+            <button class="btn btn--wa btn--block" type="button" data-send-grupo>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Separar fecha por WhatsApp</span>
+            </button>
+            <p class="err" data-gr-err role="alert" hidden></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Colección Navidad -->
+  <section class="navidad" id="navidad" aria-labelledby="navidad-t">
+
+    <div class="wrap">
+      <header class="sec-head sec-head--light" data-reveal>
+        <p class="script script--gold">Christmas Collection</p>
+        <h2 id="navidad-t" class="h2">Colección Navidad</h2>
+        <p class="pill pill--gold" data-precios-etiqueta></p>
+      </header>
+      <div class="filters" data-filters role="group" aria-label="Filtrar colección"></div>
+      <ul class="grid" data-grid></ul>
+      <p class="grid__note" data-grid-note></p>
+    </div>
+  </section>
+
+  <!-- 5. Colecciones del año -->
+  <section class="anio" id="colecciones" aria-labelledby="anio-t">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="script">todo el año</p>
+        <h2 id="anio-t" class="h2">Colecciones por temporada</h2>
+        <p class="lead">Cada temporada trae su colección. Estas son algunas de las que ya pasaron por la tienda.</p>
+      </header>
+      <ul class="seasons" data-seasons></ul>
+    </div>
+  </section>
+
+  <!-- 6. El taller por dentro -->
+  <section class="taller" id="taller" aria-labelledby="taller-t">
+    <div class="wrap taller__in">
+      <header class="sec-head" data-reveal>
+        <p class="script">workshop</p>
+        <h2 id="taller-t" class="h2">El taller por dentro</h2>
+      </header>
+      <div class="taller__grid">
+        <div class="taller__card" data-reveal>
+          <h3>Qué aprendes</h3>
+          <ul class="ticks" data-aprendes></ul>
+        </div>
+        <div class="taller__card" data-reveal>
+          <h3>Qué incluye</h3>
+          <ul class="ticks" data-incluye></ul>
+        </div>
+        <figure class="taller__table" data-reveal>
+          <svg viewBox="0 0 320 170" role="img" aria-label="Ilustración referencial de la mesa larga del taller con velas">
+            <rect x="10" y="98" width="300" height="14" rx="4" fill="#c9a98a"/>
+            <rect x="26" y="112" width="8" height="48" fill="#a8876a"/><rect x="286" y="112" width="8" height="48" fill="#a8876a"/>
+            <g fill="#fbf6ef" stroke="#6b1e33" stroke-width="1.5">
+              <rect x="44" y="66" width="20" height="32" rx="3"/><rect x="92" y="58" width="22" height="40" rx="3"/><rect x="146" y="70" width="18" height="28" rx="3"/><rect x="198" y="60" width="24" height="38" rx="3"/><rect x="252" y="68" width="20" height="30" rx="3"/>
+            </g>
+            <g fill="#f2b84b"><ellipse cx="54" cy="58" rx="4" ry="8"/><ellipse cx="103" cy="50" rx="4" ry="8"/><ellipse cx="155" cy="62" rx="4" ry="8"/><ellipse cx="210" cy="52" rx="4" ry="8"/><ellipse cx="262" cy="60" rx="4" ry="8"/></g>
+            <g fill="#e4a5ae" opacity=".8"><circle cx="76" cy="92" r="6"/><circle cx="180" cy="92" r="6"/><circle cx="236" cy="92" r="5"/></g>
+          </svg>
+          <figcaption data-img-note></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Regalos corporativos (oculto si corporativo.mostrar = false) -->
+  <section class="corp" id="corporativo" aria-labelledby="corp-t" data-corp hidden>
+    <div class="wrap">
+      <header class="sec-head">
+        <p class="script">para tu equipo</p>
+        <h2 id="corp-t" class="h2">Regalos corporativos</h2>
+      </header>
+      <form class="corp__form" data-corp-form novalidate>
+        <div class="field"><label for="c-emp">Empresa</label><input id="c-emp" type="text" maxlength="80" data-c-emp></div>
+        <div class="field"><label for="c-cant">Cantidad</label><input id="c-cant" type="number" min="1" inputmode="numeric" data-c-cant></div>
+        <div class="field"><label for="c-pres">Presupuesto por unidad (USD)</label><input id="c-pres" type="number" min="1" inputmode="decimal" data-c-pres></div>
+        <div class="field"><label for="c-fecha">Fecha</label><input id="c-fecha" type="date" data-c-fecha></div>
+        <button class="btn btn--wa btn--block" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Cotizar por WhatsApp</span></button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 8. El local -->
+  <section class="local" id="local" aria-labelledby="local-t">
+    <div class="wrap local__in">
+      <div class="local__copy" data-reveal>
+        <p class="script">visítanos</p>
+        <h2 id="local-t" class="h2">El local</h2>
+        <p class="local__addr" data-local-addr></p>
+        <p class="lead" data-local-desc></p>
+        <p class="local__hours" data-local-hours></p>
+        <a class="btn btn--wine" data-maps href="#" target="_blank" rel="noopener">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-pin"/></svg><span>Cómo llegar</span>
+        </a>
+      </div>
+      <figure class="local__art" data-reveal>
+        <svg viewBox="0 0 320 240" role="img" aria-label="Ilustración referencial de las repisas del local">
+          <rect x="0" y="0" width="320" height="240" rx="18" fill="#f4dfdc"/>
+          <g fill="#c9a98a"><rect x="30" y="70" width="260" height="8" rx="3"/><rect x="30" y="140" width="260" height="8" rx="3"/><rect x="30" y="210" width="260" height="8" rx="3"/></g>
+          <g fill="#fbf6ef" stroke="#6b1e33" stroke-width="1.5">
+            <rect x="48" y="40" width="22" height="30" rx="3"/><rect x="86" y="30" width="26" height="40" rx="4"/><rect x="128" y="46" width="18" height="24" rx="3"/>
+            <path d="M188 70l14-34 14 34z"/><rect x="232" y="38" width="30" height="32" rx="14"/>
+            <rect x="52" y="112" width="34" height="28" rx="3"/><rect x="104" y="104" width="20" height="36" rx="3"/><circle cx="160" cy="124" r="15"/><rect x="196" y="110" width="26" height="30" rx="3"/><path d="M244 140l12-30 12 30z"/>
+            <rect x="60" y="176" width="40" height="34" rx="4"/><rect x="120" y="184" width="24" height="26" rx="3"/><rect x="164" y="172" width="30" height="38" rx="4"/><rect x="216" y="182" width="44" height="28" rx="4"/>
+          </g>
+          <g fill="#b7a3c8"><circle cx="136" cy="190" r="4"/><circle cx="72" cy="122" r="4"/></g>
+          <g fill="#e4a5ae"><circle cx="246" cy="52" r="5"/><circle cx="178" cy="190" r="5"/></g>
+        </svg>
+        <figcaption data-img-note></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 9. Galería -->
+  <section class="galeria" id="galeria" aria-labelledby="gal-t">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="script">hechos con amor</p>
+        <h2 id="gal-t" class="h2">Pedidos entregados</h2>
+      </header>
+      <div class="gal" data-galeria></div>
+    </div>
+  </section>
+
+  <!-- 10. FAQ -->
+  <section class="faq" id="faq" aria-labelledby="faq-t">
+    <div class="wrap faq__in">
+      <header class="sec-head" data-reveal>
+        <p class="script">dudas</p>
+        <h2 id="faq-t" class="h2">Preguntas frecuentes</h2>
+      </header>
+      <div class="faq__list" data-faq></div>
+    </div>
+  </section>
+
+  <!-- 11. Pedido -->
+  <section class="pedido" id="pedido" aria-labelledby="pedido-t">
+    <div class="wrap pedido__in">
+      <header class="sec-head sec-head--light" data-reveal>
+        <p class="script script--rose">escríbenos</p>
+        <h2 id="pedido-t" class="h2">¿Algo especial en mente?</h2>
+        <p class="lead">Cuéntanos qué quieres y te abrimos WhatsApp con el mensaje listo.</p>
+      </header>
+      <form class="pform" data-pform novalidate>
+        <div class="field"><label for="p-nombre">Tu nombre</label><input id="p-nombre" type="text" maxlength="60" autocomplete="name" required data-p-nombre></div>
+        <div class="field"><label for="p-que">¿Qué quieres?</label><input id="p-que" type="text" maxlength="100" placeholder="Ej: un bouquet rosa" required data-p-que></div>
+        <div class="field"><label for="p-fecha">¿Para cuándo?</label><input id="p-fecha" type="date" data-p-fecha></div>
+        <div class="field"><label for="p-det">Detalle</label><textarea id="p-det" rows="3" maxlength="400" placeholder="Colores, ocasión, lo que se te ocurra" data-p-det></textarea></div>
+        <button class="btn btn--wa btn--block" type="submit"><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg><span>Enviar por WhatsApp</span></button>
+        <p class="err" data-p-err role="alert" hidden>Escribe tu nombre y qué quieres.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p class="foot__brand">VELAT<span class="brand__i">Í</span></p>
+    <p class="foot__addr" data-foot-addr></p>
+    <a class="foot__ig" href="https://www.instagram.com/velati.ec/" target="_blank" rel="noopener">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-ig"/></svg><span>@velati.ec</span>
+    </a>
+    <p class="foot__demo" data-demo-text-foot></p>
+  </div>
+</footer>
+
+<a class="fab" data-wa="flotante" href="#" target="_blank" rel="noopener" aria-label="Escribir a Velati por WhatsApp">
+  <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-wa"/></svg>
+</a>
+
+<a class="giftbar" href="#sum-t" data-giftbar aria-live="polite"><span data-giftbar-txt></span><b>Ver regalo</b></a>
+
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12.04 2a9.9 9.9 0 0 0-8.45 15.07L2.5 21.5l4.55-1.07A9.9 9.9 0 1 0 12.04 2zm0 18.03a8.1 8.1 0 0 1-4.140-1.13l-.3-.18-2.7.64.66-2.62-.2-.32a8.12 8.12 0 1 1 6.68 3.61zm4.46-6.08c-.24-.12-1.44-.71-1.66-.79-.22-.08-.39-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.53.06a6.66 6.66 0 0 1-1.95-1.2 7.3 7.3 0 0 1-1.35-1.68c-.14-.24 0-.37.1-.49.11-.11.25-.28.37-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.32-.75-1.81-.2-.47-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.74 2.740 0 0 0-.85 2.04 4.76 4.76 0 0 0 1 2.53c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28z"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm5.5-1.5h.01"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11zM12 12.2a2.3 2.3 0 1 0 0-4.6 2.3 2.3 0 0 0 0 4.6z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+</svg>
+
+<script src="vendor/gsap.min.js" defer></script>
+<script src="vendor/ScrollTrigger.min.js" defer></script>
+<script src="vendor/lenis.min.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
